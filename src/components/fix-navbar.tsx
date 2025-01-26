@@ -15,7 +15,7 @@ const config = getDefaultConfig({
 
 const queryClient = new QueryClient();
 
-export default function Home() {
+export const NavbarFix = () => {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
