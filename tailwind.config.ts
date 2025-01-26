@@ -8,6 +8,15 @@ export default {
   ],
   theme: {
     extend: {
+      animation: {
+        "gradient-border": "gradient-border 3s ease infinite",
+      },
+      keyframes: {
+        "gradient-border": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
