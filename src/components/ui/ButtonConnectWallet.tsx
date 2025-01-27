@@ -1,7 +1,10 @@
+"use client"
+
 import React from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import Link from "next/link";
 
-export const ButtonConnectWallet = () => {
+const ButtonConnectWallet = () => {
   return (
     <ConnectButton.Custom>
       {({ account, chain, openConnectModal, mounted }) => {
@@ -34,5 +37,35 @@ export const ButtonConnectWallet = () => {
         );
       }}
     </ConnectButton.Custom>
+  );
+};
+
+export const NavbarWallet = () => {
+  return (
+    <nav className="flex items-center justify-between p-4 bg-transparent shadow-md">
+      <div className="flex items-center space-x-4">
+        <Link href="/" className="text-xl font-bold text-purple-600">
+          MyDApp
+        </Link>
+        <div className="space-x-4">
+          <Link
+            href="/borrow"
+            className="text-gray-700 hover:text-purple-600"
+          >
+            borrow
+          </Link>
+          <Link
+            href="/lending"
+            className="text-gray-700 hover:text-purple-600"
+          >
+            lending
+          </Link>
+        </div>
+      </div>
+
+      <div className="relative group">
+        <ButtonConnectWallet />
+      </div>
+    </nav>
   );
 };

@@ -1,35 +1,35 @@
 "use client";
+import "@rainbow-me/rainbowkit/styles.css";
+import { darkTheme, getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { WagmiProvider, useConfig } from "wagmi";
+import { mainnet, polygon, optimism, arbitrum, base } from "wagmi/chains";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { NavbarWallet } from "./ui/ButtonConnectWallet";
 
-import React from "react";
-import Link from "next/link";
-import { ButtonConnectWallet } from "./ButtonConnectWallet";
+
+const config = getDefaultConfig({
+  appName: "My RainbowKit App",
+  projectId: "YOUR_PROJECT_ID",
+  chains: [mainnet, polygon, optimism, arbitrum, base],
+  ssr: true, // If your dApp uses server side rendering (SSR)
+});
+
+const queryClient = new QueryClient();
 
 export const Navbar = () => {
   return (
-    <nav className="flex items-center justify-between p-4 bg-transparent shadow-md">
-      <div className="flex items-center space-x-4">
-        <Link href="/" className="text-xl font-bold text-purple-600">
-          MyDApp
-        </Link>
-        <div className="space-x-4">
-          <Link
-            href="/BorrowPage"
-            className="text-gray-700 hover:text-purple-600"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/LendingPage"
-            className="text-gray-700 hover:text-purple-600"
-          >
-            Marketplace
-          </Link>
-        </div>
-      </div>
-
-      <div className="relative group">
-        <ButtonConnectWallet />
-      </div>
-    </nav>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider
+          theme={darkTheme({
+            accentColor: "#7b3fe4",
+            accentColorForeground: "white",
+            borderRadius: "medium",
+          })}
+        >
+          <NavbarWallet />
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
-};
+}

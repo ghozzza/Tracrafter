@@ -5,7 +5,7 @@ import { Table } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { NavbarFix } from "@/components/fix-navbar";
+import { Navbar } from "@/components/navbar";
 import { ArrowDownUp, Zap } from "lucide-react";
 
 interface BorrowDataItem {
@@ -86,7 +86,7 @@ export default function BorrowPage() {
 
   return (
     <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      <NavbarFix />
+      <Navbar />
       <div className="min-h-screen  text-white flex justify-center items-center p-8">
         <Card className="w-full max-w-6xl mx-auto mt-10 bg-gray-800/60 backdrop-blur-lg border-none shadow-2xl rounded-2xl p-6">
           <CardHeader className="text-center">
