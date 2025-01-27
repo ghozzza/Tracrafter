@@ -1,14 +1,14 @@
 import { Navbar } from '@/components/navbar'
 import React from 'react'
-import HomePage from './_page'
+import LandingPage from './landing'
 
-const Home = () => {
+const HomePage = () => {
   return (
     <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black">
         <Navbar />
-        <HomePage />
+        <LandingPage />
     </div>
   )
 }
 
-export default Home
+export default HomePage
