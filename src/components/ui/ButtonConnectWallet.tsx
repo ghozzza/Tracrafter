@@ -3,34 +3,82 @@
 import React from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
-import { Wallet2, LineChart, PiggyBank } from "lucide-react";
+import { Wallet2, LineChart, PiggyBank, LogOut, Copy } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const ButtonConnectWallet = () => {
   return (
     <ConnectButton.Custom>
-      {({ account, chain, openConnectModal, mounted }) => {
+      {({
+        account,
+        chain,
+        openConnectModal,
+        openChainModal,
+        openAccountModal,
+        mounted
+      }) => {
         return (
           <div className="relative group">
-            <button
-              onClick={openConnectModal}
-              className="relative z-10 px-6 py-3 rounded-full
-                bg-gradient-to-r from-[#0057a3] via-[#008f68] to-[#ffd700]
-                animate-gradient-x bg-[length:200%_100%]
-                text-white font-medium
-                transform transition-all duration-1500 
-                hover:shadow-[0_0_20px_rgba(79,70,229,0.4)]
-                hover:scale-[1.02]
-                border border-[#3f3f9f]/30"
-            >
+            {!account ? (
+              // Connect Wallet Button
+              <button
+                onClick={openConnectModal}
+                className="relative z-10 px-6 py-3 rounded-full
+                  bg-gradient-to-r from-[#0057a3] via-[#008f68] to-[#ffd700]
+                  animate-gradient-x bg-[length:200%_100%]
+                  text-white font-medium
+                  transform transition-all duration-1500 
+                  hover:shadow-[0_0_20px_rgba(79,70,229,0.4)]
+                  hover:scale-[1.02]
+                  border border-[#3f3f9f]/30"
+              >
+                <div className="flex items-center space-x-2">
+                  <Wallet2 className="w-5 h-5" />
+                  <span>Connect Wallet</span>
+                </div>
+              </button>
+            ) : (
+              // Connected Wallet Interface
               <div className="flex items-center space-x-2">
-                <Wallet2 className="w-5 h-5" />
-                <span>
-                  {account ? `${account.displayName}` : "Connect Wallet"}
-                </span>
-              </div>
-            </button>
+                <button
+                  onClick={openAccountModal}
+                  className="relative z-10 px-6 py-3 rounded-full
+                    bg-gradient-to-r from-[#0057a3] via-[#008f68] to-[#ffd700]
+                    animate-gradient-x bg-[length:200%_100%]
+                    text-white font-medium
+                    transform transition-all duration-1500 
+                    hover:shadow-[0_0_20px_rgba(79,70,229,0.4)]
+                    hover:scale-[1.02]
+                    border border-[#3f3f9f]/30"
+                >
+                  <div className="flex items-center space-x-2">
+                    <img
+                      src={account.ensAvatar || '/default-avatar.png'}
+                      alt="Profile"
+                      className="w-5 h-5 rounded-full"
+                    />
+                    <span>{account.displayName}</span>
+                  </div>
+                </button>
 
+                <button
+                  onClick={() => navigator.clipboard.writeText(account.address)}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  title="Copy Address"
+                >
+                  <Copy className="w-5 h-5" />
+                </button>
+
+                <button
+                  onClick={openAccountModal}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  title="Disconnect"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+            
             {/* Glow effect */}
             <div
               className="absolute inset-0 -z-10
