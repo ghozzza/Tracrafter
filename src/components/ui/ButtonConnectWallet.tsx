@@ -15,7 +15,7 @@ const ButtonConnectWallet = () => {
         openConnectModal,
         openChainModal,
         openAccountModal,
-        mounted
+        mounted,
       }) => {
         return (
           <div className="relative group">
@@ -52,33 +52,12 @@ const ButtonConnectWallet = () => {
                     border border-[#3f3f9f]/30"
                 >
                   <div className="flex items-center space-x-2">
-                    <img
-                      src={account.ensAvatar || '/default-avatar.png'}
-                      alt="Profile"
-                      className="w-5 h-5 rounded-full"
-                    />
                     <span>{account.displayName}</span>
                   </div>
                 </button>
-
-                <button
-                  onClick={() => navigator.clipboard.writeText(account.address)}
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                  title="Copy Address"
-                >
-                  <Copy className="w-5 h-5" />
-                </button>
-
-                <button
-                  onClick={openAccountModal}
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                  title="Disconnect"
-                >
-                  <LogOut className="w-5 h-5" />
-                </button>
               </div>
             )}
-            
+
             {/* Glow effect */}
             <div
               className="absolute inset-0 -z-10
@@ -161,6 +140,5 @@ export const NavbarWallet: React.FC = () => {
     </nav>
   );
 };
-
 
 export default NavbarWallet;
