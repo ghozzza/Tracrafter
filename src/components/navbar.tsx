@@ -1,10 +1,10 @@
 "use client";
 import "@rainbow-me/rainbowkit/styles.css";
 import { darkTheme, getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { WagmiProvider, useConfig } from "wagmi";
+import { WagmiProvider } from "wagmi";
 import { mainnet, polygon, optimism, arbitrum, base } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { NavbarWallet } from "./ui/ButtonConnectWallet";
+import NavbarWallet from "./ui/NavbarWallet";
 
 
 const config = getDefaultConfig({
