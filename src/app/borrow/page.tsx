@@ -155,10 +155,10 @@ export default function BorrowPage() {
                     <td className="font-semibold text-purple-300 p-4">
                       {item.asset}
                     </td>
-                    <td className="p-4">{item.availableToBorrow}</td>
-                    <td className="p-4">{item.borrowRate}%</td>
-                    <td className="p-4">{item.collateralRequired}</td>
-                    <td className="p-4">
+                    <td className="p-4 text-gray-50">{item.availableToBorrow}</td>
+                    <td className="p-4 text-gray-50">{item.borrowRate}%</td>
+                    <td className="p-4 text-gray-50">{item.collateralRequired}</td>
+                    <td className="p-4 ">
                       <span
                         className={`px-3 py-1 rounded-full text-xs inline-block ${getVolatilityColor(
                           item.volatility
