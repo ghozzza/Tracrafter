@@ -59,7 +59,7 @@ const LandingPage = () => {
               Launch App
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button size="lg" variant="outline" className="border-gray-700 hover:bg-gray-800">
+            <Button size="lg" variant="outline" className="border-gray-700 hover:bg-gray-600 bg-slate-400">
               <Github className="mr-2 w-4 h-4" />
               View on GitHub
             </Button>
