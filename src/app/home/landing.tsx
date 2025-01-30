@@ -3,6 +3,9 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Zap, LineChart, Github } from "lucide-react";
+import { useReadContract,  useWriteContract, useWaitForTransactionReceipt  } from "wagmi";
+import { abi } from "@/lib/abi/MOCKabi";
+
 
 const LandingPage = () => {
   const fadeInUp = {
@@ -10,15 +13,23 @@ const LandingPage = () => {
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.6 }
   };
+  const {data: hashTransction, isPending: isTransctionPending, writeContract: writeTransaction} = useWriteContract();
+  const {isLoading: isTransactionLoading} = useWaitForTransactionReceipt({hash: hashTransction});
+  const handleTransaction = async() => {
+    await writeTransaction({abi: abi, address: "0x0ff609e5cc4ed4c967dac6584685183674cbaa24", functionName: "transfer", args: ["0x61F2B7781b3cb4B8eB77FC1aFd4F23179303AD66", 0]})
+  }
 
+  const {data : balance } = useReadContract({
+    address: "0x0ff609e5cc4ed4c967dac6584685183674cbaa24", abi: abi, functionName: "balanceOf", args: ["0x61F2B7781b3cb4B8eB77FC1aFd4F23179303AD66"]
+  })
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white">
-      {/* Hero Section */}
+      <button onClick={handleTransaction}>
+        proses
+      </button>
       <section className="relative h-screen flex flex-col justify-center items-center px-4 overflow-hidden">
-        {/* Animated background gradient */}
+
         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-teal-500/10 animate-gradient-x bg-[length:200%_200%] blur-3xl" />
-        
-        {/* Content */}
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -28,6 +39,7 @@ const LandingPage = () => {
           >
             <span className="px-4 py-2 rounded-full bg-blue-500/10 text-blue-400 text-sm font-medium">
               Welcome to the Future of DeFi
+              {balance?.toString()}
             </span>
           </motion.div>
 
@@ -56,6 +68,7 @@ const LandingPage = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
           >
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 group">
+              
               Launch App
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>
