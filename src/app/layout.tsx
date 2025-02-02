@@ -47,11 +47,9 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
                 overlayBlur: "small",
               })}
             >
-              <div className="flex min-h-screen flex-col">
+              <div className="min-h-screen">
                 <Navbar />
-                <main className="flex-1">
-                  {children}
-                </main>
+                <main className="mt-10">{children}</main>
               </div>
             </RainbowKitProvider>
           </QueryClientProvider>

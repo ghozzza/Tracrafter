@@ -17,7 +17,6 @@ const ButtonConnectWallet = () => {
         mounted,
       }) => {
         const ready = mounted && authenticationStatus !== "loading";
-        
         return (
           <div
             {...(!ready && {
@@ -50,7 +49,8 @@ const ButtonConnectWallet = () => {
                         <span>Connect Wallet</span>
                       </div>
                     </button>
-                    <div className="absolute inset-0 -z-10
+                    <div
+                      className="absolute inset-0 -z-10
                       bg-gradient-to-r from-blue-600/20 via-green-600/20 to-yellow-600/20
                       animate-gradient-x bg-[length:200%_100%]
                       rounded-full blur-xl
@@ -93,29 +93,10 @@ const ButtonConnectWallet = () => {
                   >
                     <div className="flex items-center space-x-2">
                       <span>{account.displayName}</span>
-                      {chain.hasIcon && (
-                        <div
-                          style={{
-                            background: chain.iconBackground,
-                            width: 12,
-                            height: 12,
-                            borderRadius: 999,
-                            overflow: 'hidden',
-                            marginLeft: 4,
-                          }}
-                        >
-                          {chain.iconUrl && (
-                            <img
-                              alt={chain.name ?? 'Chain icon'}
-                              src={chain.iconUrl}
-                              style={{ width: 12, height: 12 }}
-                            />
-                          )}
-                        </div>
-                      )}
                     </div>
                   </button>
-                  <div className="absolute inset-0 -z-10
+                  <div
+                    className="absolute inset-0 -z-10
                     bg-gradient-to-r from-blue-600/20 via-green-600/20 to-yellow-600/20
                     animate-gradient-x bg-[length:200%_100%]
                     rounded-full blur-xl

@@ -5,8 +5,13 @@ import { Table } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import  Navbar  from "@/components/navbar";
 import { ArrowDownUp, Zap } from "lucide-react";
+import {
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
+import { abi } from "@/lib/abi";
 
 interface BorrowDataItem {
   id: number;
@@ -27,6 +32,30 @@ const mockBorrowData: BorrowDataItem[] = Array.from({ length: 50 }, (_, i) => ({
 }));
 
 export default function BorrowPage() {
+  const {
+    data: hashTransction,
+    isPending: isTransctionPending,
+    writeContract: writeTransaction,
+  } = useWriteContract();
+  const { isLoading: isTransactionLoading } = useWaitForTransactionReceipt({
+    hash: hashTransction,
+  });
+  const handleTransaction = async () => {
+    await writeTransaction({
+      abi: abi,
+      address: "0x0ff609e5cc4ed4c967dac6584685183674cbaa24",
+      functionName: "transfer",
+      args: ["0x61F2B7781b3cb4B8eB77FC1aFd4F23179303AD66", 0],
+    });
+  };
+
+  const { data: balance } = useReadContract({
+    address: "0x0ff609e5cc4ed4c967dac6584685183674cbaa24",
+    abi: abi,
+    functionName: "balanceOf",
+    args: ["0x61F2B7781b3cb4B8eB77FC1aFd4F23179303AD66"],
+  });
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortKey, setSortKey] = useState<
@@ -86,7 +115,6 @@ export default function BorrowPage() {
 
   return (
     <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      <Navbar />
       <div className="min-h-screen  text-white flex justify-center items-center p-8">
         <Card className="w-full max-w-6xl mx-auto mt-10 bg-gray-800/60 backdrop-blur-lg border-none shadow-2xl rounded-2xl p-6">
           <CardHeader className="text-center">
@@ -155,9 +183,13 @@ export default function BorrowPage() {
                     <td className="font-semibold text-purple-300 p-4">
                       {item.asset}
                     </td>
-                    <td className="p-4 text-gray-50">{item.availableToBorrow}</td>
+                    <td className="p-4 text-gray-50">
+                      {item.availableToBorrow}
+                    </td>
                     <td className="p-4 text-gray-50">{item.borrowRate}%</td>
-                    <td className="p-4 text-gray-50">{item.collateralRequired}</td>
+                    <td className="p-4 text-gray-50">
+                      {item.collateralRequired}
+                    </td>
                     <td className="p-4 ">
                       <span
                         className={`px-3 py-1 rounded-full text-xs inline-block ${getVolatilityColor(
@@ -205,6 +237,13 @@ export default function BorrowPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
+      <div>
+        <Button onClick={handleTransaction} variant="default" size="lg">
+          Get Started
+        </Button>
+        {balance?.toString()}
+        <h1 className="text-white">hello</h1>
       </div>
     </div>
   );
