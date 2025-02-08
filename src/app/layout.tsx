@@ -27,7 +27,7 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
-  // Create a new QueryClient instance for each session
+
   const [queryClient] = useState(() => new QueryClient());
 
   return (
