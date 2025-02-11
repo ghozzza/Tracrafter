@@ -88,12 +88,12 @@ const Navbar: React.FC = () => {
         <div className="flex items-center space-x-8">
           <Link
             href="/"
-            className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-green-500 to-yellow-400 
+            className="text-2xl font-bold bg-gradient-to-r from-[#b721ff] to-[#21d4fd] 
               animate-gradient-x bg-[length:200%_100%] 
               bg-clip-text text-transparent 
               hover:opacity-80 transition-opacity"
           >
-            MyDApp
+            TraCrafter
           </Link>
           <div className="hidden md:flex items-center space-x-6">
             <NavLink href="/borrow">
@@ -106,7 +106,6 @@ const Navbar: React.FC = () => {
             </NavLink>
           </div>
         </div>
-        
         <div className="hidden md:flex items-center space-x-6">
           <ButtonConnectWallet />
         </div>
