@@ -114,7 +114,7 @@ export default function BorrowPage() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="">
       <div className="min-h-screen  text-white flex justify-center items-center p-8">
         <Card className="w-full max-w-6xl mx-auto mt-10 bg-gray-800/60 backdrop-blur-lg border-none shadow-2xl rounded-2xl p-6">
           <CardHeader className="text-center">

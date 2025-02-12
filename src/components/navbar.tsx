@@ -48,24 +48,24 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (isOpen && !target.closest('nav')) {
+      if (isOpen && !target.closest("nav")) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [isOpen]);
 
   // Prevent scroll when menu is open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
@@ -79,11 +79,6 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
-      {/* Background gradients */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0d0d21] to-[#15162c]" />
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-md border-b border-white/10" />
-
-      {/* Main navbar content */}
       <div className="relative flex items-center justify-between px-6 py-4 mx-auto max-w-7xl">
         <div className="flex items-center space-x-8">
           <Link
@@ -122,12 +117,12 @@ const Navbar: React.FC = () => {
         {/* Mobile menu */}
         {isOpen && (
           <div className="md:hidden">
-            <div 
+            <div
               className="fixed inset-0 bg-black/50 backdrop-blur-sm"
               onClick={closeMenu}
               role="presentation"
             />
-            <div 
+            <div
               className="fixed top-0 right-0 h-full w-64 bg-[#0d0d21] transform transition-transform duration-300 ease-in-out border-l border-white/10"
               role="dialog"
               aria-modal="true"

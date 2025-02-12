@@ -27,7 +27,6 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
-
   const [queryClient] = useState(() => new QueryClient());
 
   return (
@@ -47,9 +46,11 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
                 overlayBlur: "small",
               })}
             >
-              <div className="min-h-screen">
-                <Navbar />
-                <main className="mt-10">{children}</main>
+              <div className="flex flex-col min-h-screen">
+                <div className="">
+                  <Navbar />
+                </div>
+                <div className="mt-5">{children}</div>
               </div>
             </RainbowKitProvider>
           </QueryClientProvider>
