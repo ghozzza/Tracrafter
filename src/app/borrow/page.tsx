@@ -1,249 +1,239 @@
-"use client";
-
-import React, { useState } from "react";
-import { Table } from "@/components/ui/table";
+"use client"
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ArrowDownUp, Zap } from "lucide-react";
-import {
-  useReadContract,
-  useWriteContract,
-  useWaitForTransactionReceipt,
-} from "wagmi";
-import { abi } from "@/lib/abi";
+import { Info, Settings, ChevronDown, Zap, ArrowUpDown, Wallet, ChevronUp } from "lucide-react";
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-interface BorrowDataItem {
-  id: number;
-  asset: string;
-  availableToBorrow: string;
-  borrowRate: string;
-  collateralRequired: string;
-  volatility: string;
+interface AssetItem {
+  id: string;
+  name: string;
+  icon: string;
+  available: number;
+  apy: number;
+  borrowed?: number
 }
 
-const mockBorrowData: BorrowDataItem[] = Array.from({ length: 50 }, (_, i) => ({
-  id: i + 1,
-  asset: ["ETH", "USDC", "DAI", "WBTC", "LINK"][i % 5],
-  availableToBorrow: (Math.random() * 1000).toFixed(2),
-  borrowRate: (Math.random() * 10).toFixed(2),
-  collateralRequired: (Math.random() * 5000).toFixed(2),
-  volatility: ["Low", "Medium", "High"][Math.floor(Math.random() * 3)],
-}));
+const mockAssets: AssetItem[] = [
+  { id: "usdc", name: "USDC", icon: "#usdc", available: 100, apy: 23.78, borrowed: 0.01 },
+  { id: "btcb", name: "BTCB", icon: "#btc", available: 10, apy: 0.27 },
+  { id: "bnb", name: "BNB", icon: "#bnb", available: 20, apy: 1.96 },
+  { id: "usdt", name: "USDT", icon: "#usdt", available: 30, apy: 8.54 },
+  { id: "eth", name: "ETH", icon: "#eth", available: 15, apy: 5.4 },
+];
 
 export default function BorrowPage() {
-  const {
-    data: hashTransction,
-    isPending: isTransctionPending,
-    writeContract: writeTransaction,
-  } = useWriteContract();
+  const { data: hashTransaction, isPending, writeContract } = useWriteContract();
   const { isLoading: isTransactionLoading } = useWaitForTransactionReceipt({
-    hash: hashTransction,
-  });
-  const handleTransaction = async () => {
-    await writeTransaction({
-      abi: abi,
-      address: "0x0ff609e5cc4ed4c967dac6584685183674cbaa24",
-      functionName: "transfer",
-      args: ["0x61F2B7781b3cb4B8eB77FC1aFd4F23179303AD66", 0],
-    });
-  };
-
-  const { data: balance } = useReadContract({
-    address: "0x0ff609e5cc4ed4c967dac6584685183674cbaa24",
-    abi: abi,
-    functionName: "balanceOf",
-    args: ["0x61F2B7781b3cb4B8eB77FC1aFd4F23179303AD66"],
+    hash: hashTransaction,
   });
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [sortKey, setSortKey] = useState<
-    | keyof Pick<
-        BorrowDataItem,
-        "availableToBorrow" | "borrowRate" | "collateralRequired"
-      >
-    | null
-  >(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const itemsPerPage = 10;
+  const [isExpanded, setIsExpanded] = useState(true)
+  const [sortBy, setSortBy] = useState<string | null>(null);
+  const [ascending, setAscending] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const itemsPerPage = 3;
 
-  const filteredAndSortedData = mockBorrowData
-    .filter((item) =>
-      item.asset.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (!sortKey) return 0;
-      const valueA = parseFloat(a[sortKey]);
-      const valueB = parseFloat(b[sortKey]);
-      return sortDirection === "asc" ? valueA - valueB : valueB - valueA;
-    });
+  const borrowPowerUsed = 3.13
 
-  const paginatedData = filteredAndSortedData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+  const sortedAssets = [...mockAssets].sort((a, b) => {
+    if (!sortBy) return 0;
+    return ascending ? a[sortBy] - b[sortBy] : b[sortBy] - a[sortBy];
+  });
+
+  const filteredAssets = sortedAssets.filter((asset) =>
+    asset.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
-
-  const handleSort = (
-    key: keyof Pick<
-      BorrowDataItem,
-      "availableToBorrow" | "borrowRate" | "collateralRequired"
-    >
-  ) => {
-    if (sortKey === key) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortKey(key);
-      setSortDirection("asc");
-    }
-  };
-
-  const getVolatilityColor = (volatility: string) => {
-    switch (volatility) {
-      case "Low":
-        return "bg-green-600/20 text-green-400";
-      case "Medium":
-        return "bg-yellow-600/20 text-yellow-400";
-      case "High":
-        return "bg-red-600/20 text-red-400";
-      default:
-        return "bg-gray-600/20 text-gray-400";
-    }
-  };
+  const totalPages = Math.ceil(filteredAssets.length / itemsPerPage);
+  const paginatedAssets = filteredAssets.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="">
-      <div className="min-h-screen  text-white flex justify-center items-center p-8">
-        <Card className="w-full max-w-6xl mx-auto mt-10 bg-gray-800/60 backdrop-blur-lg border-none shadow-2xl rounded-2xl p-6">
-          <CardHeader className="text-center">
-            <CardTitle className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-6">
-              Borrow Marketplace
-            </CardTitle>
-            <div className="flex justify-center items-center mb-6">
-              <Input
-                placeholder="Search assets"
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-1/2 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-              />
+    <div className="min-h-screen p-8">
+      <div className="mx-auto max-w-6xl space-y-8 mt-5">
+
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-2 text-4xl font-bold text-white">
+            <Wallet className="h-12 w-12 text-blue-500" />
+            <h1>Borrow</h1>
+          </div>
+          <p className="text-slate-400">The Best DeFi Yields In 1-Click</p>
+        </div>
+
+        <Card className="bg-slate-900/50 border-none">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <CardTitle className="text-xl text-white">Your borrows</CardTitle>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-slate-400">E-Mode</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-[#31323d] text-white border-none hover:bg-[#31323d]/80"
+                  >
+                    <Settings className="w-4 h-4 mr-1" />
+                    DISABLED
+                  </Button>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)} className="text-slate-400">
+                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </div>
+          </CardHeader>
+          {isExpanded && (
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-4">
+                  <div className="space-y-1">
+                    <div className="text-sm text-slate-400">Balance</div>
+                    <div className="text-lg font-medium text-white">$0.01</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-sm text-slate-400">APY</div>
+                    <div className="text-lg font-medium text-white">23.78%</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-sm text-slate-400">Borrow power used</div>
+                    <div className="text-lg font-medium text-white">{borrowPowerUsed}%</div>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="text-sm text-slate-400">
+                        <th className="text-left py-2">Asset</th>
+                        <th className="text-left py-2">Debt</th>
+                        <th className="text-left py-2">APY</th>
+                        <th className="text-left py-2">APY type</th>
+                        <th className="text-right py-2">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {mockAssets
+                        .filter((asset) => asset.borrowed)
+                        .map((asset) => (
+                          <tr key={asset.id} className="border-t border-slate-800">
+                            <td className="py-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-blue-500/20" />
+                                <span className="font-medium text-white">{asset.name}</span>
+                              </div>
+                            </td>
+                            <td className="py-3 text-white">${asset.borrowed}</td>
+                            <td className="py-3 text-white">{asset.apy}%</td>
+                            <td className="py-3">
+                              <Select defaultValue="variable">
+                                <SelectTrigger className="w-[100px] bg-[#31323d] border-none">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="variable">Variable</SelectItem>
+                                  <SelectItem value="fixed">Fixed</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </td>
+                            <td className="py-3">
+                              <div className="flex justify-end gap-2">
+                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                                  Switch
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-slate-600 text-slate-600 hover:bg-slate-400"
+                                >
+                                  Repay
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </CardContent>
+          )}
+        </Card>
+
+        {/* Search */}
+        <input
+          type="text"
+          placeholder="Search asset..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="p-2 rounded-md border border-gray-600 bg-slate-800 text-white w-full mb-4"
+        />
+
+        {/* Assets to Borrow */}
+        <Card className="bg-slate-900/50 border-none shadow-xl">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl font-medium text-slate-200">Assets to borrow</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <Table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-700">
-                  {[
-                    "Asset",
-                    "Available to Borrow",
-                    "Borrow Rate",
-                    "Collateral Required",
-                  ].map((label, index) => (
-                    <th
-                      key={label}
-                      onClick={() =>
-                        handleSort(
-                          [
-                            "availableToBorrow",
-                            "borrowRate",
-                            "collateralRequired",
-                          ][index] as keyof Pick<
-                            BorrowDataItem,
-                            | "availableToBorrow"
-                            | "borrowRate"
-                            | "collateralRequired"
-                          >
-                        )
-                      }
-                      className="text-center cursor-pointer hover:bg-gray-700 transition-colors group p-4"
-                    >
-                      <div className="flex items-center justify-center">
-                        {label}
-                        <ArrowDownUp
-                          className="ml-2 opacity-50 group-hover:opacity-100 transition-opacity"
-                          size={16}
-                        />
-                      </div>
-                    </th>
-                  ))}
-                  <th className="text-center">Volatility</th>
-                  <th className="text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedData.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="hover:bg-gray-700/50 transition-colors text-center"
-                  >
-                    <td className="font-semibold text-purple-300 p-4">
-                      {item.asset}
-                    </td>
-                    <td className="p-4 text-gray-50">
-                      {item.availableToBorrow}
-                    </td>
-                    <td className="p-4 text-gray-50">{item.borrowRate}%</td>
-                    <td className="p-4 text-gray-50">
-                      {item.collateralRequired}
-                    </td>
-                    <td className="p-4 ">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs inline-block ${getVolatilityColor(
-                          item.volatility
-                        )}`}
-                      >
-                        {item.volatility}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <Button
-                        variant="outline"
-                        className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 border-none"
-                      >
-                        <Zap size={16} className="mr-2" /> Borrow
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+            <div className="space-y-1">
+              <div className="grid grid-cols-12 gap-4 px-4 py-2 text-sm text-slate-400">
+                <div className="col-span-3">Asset</div>
+                <div className="col-span-3 flex items-center cursor-pointer" onClick={() => { setSortBy('available'); setAscending(!ascending); }}>
+                  Available <ArrowUpDown className="w-4 h-4 ml-1" />
+                </div>
+                <div className="col-span-3 flex items-center cursor-pointer" onClick={() => { setSortBy('apy'); setAscending(!ascending); }}>
+                  APY, variable <ArrowUpDown className="w-4 h-4 ml-1" />
+                </div>
+                <div className="col-span-3">Action</div>
+              </div>
 
-            <div className="flex justify-center items-center mt-8 text-white space-x-6">
-              <div>
-                Page {currentPage} of {totalPages}
-              </div>
-              <div className="space-x-4">
-                <Button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="bg-gray-700 hover:bg-gray-600 px-6"
-                >
-                  Previous
-                </Button>
-                <Button
-                  onClick={() =>
-                    setCurrentPage((p) => Math.min(totalPages, p + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6"
-                >
-                  Next
-                </Button>
-              </div>
+              {paginatedAssets.map((asset) => (
+                <div key={asset.id} className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-[#31323d] rounded-lg">
+                  <div className="col-span-3 flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-white/10" />
+                    <span className="font-medium text-slate-400">{asset.name}</span>
+                  </div>
+                  <div className="col-span-3 text-slate-400">{asset.available}</div>
+                  <div className="col-span-3 text-slate-400">{asset.apy}%</div>
+                  <div className="col-span-3 flex gap-2">
+                    <Button
+                      className="bg-gradient-to-r from-pink-600 to-purple-600  text-white  hover:from-purple-600 hover:to-pink-600 border-none"
+                    >
+                      Borrow
+                    </Button>
+                    <Button
+                      className="hidden bg-gradient-to-r from-pink-600 to-purple-600  text-white  hover:from-purple-600 hover:to-pink-600 border-none"
+                    >
+                      Details
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
-      </div>
-      <div>
-        <Button onClick={handleTransaction} variant="default" size="lg">
-          Get Started
-        </Button>
-        {balance?.toString()}
-        <h1 className="text-white">hello</h1>
+
+        {/* Pagination */}
+        <div className="flex justify-between mt-4">
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="bg-gray-700 hover:bg-gray-600 px-6"
+          >
+            Previous
+          </Button>
+          <span className="text-white">Page {currentPage} of {totalPages}</span>
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6"
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );
