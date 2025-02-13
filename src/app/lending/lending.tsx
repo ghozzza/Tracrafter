@@ -2,9 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DollarSign, Wallet } from "lucide-react";
 import Image from "next/image";
-import image1 from "../../../public/eth.svg";
-import image2 from "../../../public/eth2.jpg";
-import ButtonConnectWallet from "@/components/ui/ButtonConnectWallet";
 
 export default function LendingPage() {
   return (

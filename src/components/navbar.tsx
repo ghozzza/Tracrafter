@@ -24,12 +24,17 @@ const NavLink: React.FC<NavLinkProps> = ({ href, children, onClick }) => {
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors group relative overflow-hidden py-2"
+      className={`flex items-center space-x-3 transition-colors py-4 px-6 w-full group relative
+        ${
+          isActive
+            ? "text-white bg-white/5"
+            : "text-gray-200 hover:text-white hover:bg-white/5"
+        }`}
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-green-500/10 to-yellow-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#b721ff]/10 via-[#21d4fd]/10 to-[#b721ff]/10 opacity-0 group-hover:opacity-100 transition-opacity" />
       {children}
       {isActive && (
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 animate-gradient-x bg-gradient-to-r from-blue-400 via-green-500 to-yellow-500" />
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 animate-gradient-x bg-gradient-to-r from-[#b721ff] via-[#21d4fd] to-[#b721ff]" />
       )}
     </Link>
   );
@@ -39,12 +44,10 @@ const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const pathname = usePathname();
 
-  // Close menu when route changes
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -57,7 +60,6 @@ const Navbar: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [isOpen]);
 
-  // Prevent scroll when menu is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -79,7 +81,8 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
-      <div className="relative flex items-center justify-between px-6 py-4 mx-auto max-w-7xl">
+      <div className="absolute inset-0 bg-[#0d0d21]/80 backdrop-blur-md border-b border-white/10" />
+      <div className="relative flex items-center justify-between h-16 px-4 md:px-16 max-w-9xl mx-auto">
         <div className="flex items-center space-x-8">
           <Link
             href="/"
@@ -91,13 +94,13 @@ const Navbar: React.FC = () => {
             TraCrafter
           </Link>
           <div className="hidden md:flex items-center space-x-6">
-            <NavLink href="/borrow">
-              <PiggyBank className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              <span>Borrow</span>
-            </NavLink>
             <NavLink href="/lending">
               <LineChart className="w-5 h-5 group-hover:scale-110 transition-transform" />
               <span>Lending</span>
+            </NavLink>
+            <NavLink href="/borrow">
+              <PiggyBank className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              <span>Borrow</span>
             </NavLink>
           </div>
         </div>
@@ -107,7 +110,7 @@ const Navbar: React.FC = () => {
 
         <button
           onClick={toggleMenu}
-          className="md:hidden p-2 text-gray-300 hover:text-white transition-colors"
+          className="md:hidden p-2 text-gray-200 hover:text-white transition-colors"
           aria-label="Toggle menu"
           type="button"
         >
@@ -118,21 +121,23 @@ const Navbar: React.FC = () => {
         {isOpen && (
           <div className="md:hidden">
             <div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/50 backdrop-blur-md"
               onClick={closeMenu}
               role="presentation"
             />
             <div
-              className="fixed top-0 right-0 h-full w-64 bg-[#0d0d21] transform transition-transform duration-300 ease-in-out border-l border-white/10"
+              className="fixed top-0 right-0 h-full w-full bg-gradient-to-b from-[#0d0d21] to-[#0d0d21]/95 backdrop-blur-lg transform transition-transform duration-300 ease-in-out"
               role="dialog"
               aria-modal="true"
               aria-label="Mobile menu"
             >
-              <div className="flex justify-between items-center p-6 border-b border-white/10">
-                <span className="text-lg font-semibold text-white">Menu</span>
+              <div className="flex justify-between items-center px-6 h-16 border-b border-white/10">
+                <span className="text-lg font-semibold bg-gradient-to-r from-[#b721ff] to-[#21d4fd] bg-clip-text text-transparent">
+                  Menu
+                </span>
                 <button
                   onClick={closeMenu}
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-gray-200 hover:text-white transition-colors"
                   aria-label="Close menu"
                   type="button"
                 >
@@ -140,7 +145,7 @@ const Navbar: React.FC = () => {
                 </button>
               </div>
 
-              <div className="p-6 space-y-4">
+              <div className="py-2">
                 <NavLink href="/borrow" onClick={closeMenu}>
                   <PiggyBank className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   <span>Borrow</span>
@@ -151,7 +156,7 @@ const Navbar: React.FC = () => {
                   <span>Lending</span>
                 </NavLink>
 
-                <div className="pt-4 border-t border-white/10">
+                <div className="px-6 pt-4 mt-4 border-t border-white/10">
                   <ButtonConnectWallet />
                 </div>
               </div>
