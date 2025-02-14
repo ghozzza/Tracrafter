@@ -33,7 +33,7 @@ const ButtonConnectWallet = () => {
               <button
                 onClick={openConnectModal}
                 type="button"
-                className="relative z-10 px-6 py-3 rounded-full bg-gradient-to-r from-[#b721ff] to-[#21d4fd] 
+                className="relative z-10 px-6 py-2 rounded-full bg-gradient-to-r from-[#b721ff] to-[#21d4fd] 
                   animate-gradient-x bg-[length:200%_100%] text-white font-medium transform transition-all duration-1500 
                   hover:shadow-[0_0_20px_rgba(79,70,229,0.4)] hover:scale-[1.02] border border-[#3f3f9f]/30"
               >
@@ -56,7 +56,7 @@ const ButtonConnectWallet = () => {
             <button
               onClick={openChainModal}
               type="button"
-              className="relative z-10 px-6 py-3 rounded-full bg-red-500 text-white font-medium transition-all hover:bg-red-600"
+              className="relative z-10 px-6 py-2 rounded-full bg-red-500 text-white font-medium transition-all hover:bg-red-600"
             >
               Wrong network
             </button>
