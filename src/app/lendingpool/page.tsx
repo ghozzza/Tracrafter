@@ -16,7 +16,7 @@ import {
 import { Label } from "@/components/ui/label";
 
 export default function LendingPage() {
-  const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as String;
+  const contractAddress = "0x455Eb1c9ED96DEAD7da6c490551e287c130A7Fe9";
   const [activeTab, setActiveTab] = useState("pool");
 
   // States remain the same
