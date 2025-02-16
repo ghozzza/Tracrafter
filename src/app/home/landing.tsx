@@ -25,7 +25,7 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white overflow-hidden fixed inset-0">vscode-webview://1cgpn8n59gjc7b8u3fu6ughpi88lq0cg4pucgqjse0ghlrjq335t/index.html?id=29668967-5d4a-4dd5-bb4a-4dc7874a2366&origin=b00a9356-58be-4d0c-803f-7c4cabe4d46c&swVersion=4&extensionId=eamodio.gitlens&platform=electron&vscode-resource-base-authority=vscode-resource.vscode-cdn.net&parentOrigin=vscode-file%3A%2F%2Fvscode-app#
+    <div className="h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white overflow-hidden fixed inset-0">
       <section className="h-full flex flex-col justify-center items-center px-4 relative">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-teal-500/10 animate-gradient-x bg-[length:200%_200%] blur-2xl md:blur-3xl" />
 
