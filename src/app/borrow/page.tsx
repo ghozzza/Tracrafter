@@ -29,13 +29,12 @@ interface AssetItem {
   apy: number;
   borrowed?: number;
 }
-
 const mockAssets: AssetItem[] = [
-  { id: "usdc", name: "USDC", icon: "#usdc", available: 100, apy: 23.78, borrowed: 0.01 },
-  { id: "btcb", name: "BTCB", icon: "#btc", available: 10, apy: 0.27 },
-  { id: "bnb", name: "BNB", icon: "#bnb", available: 20, apy: 1.96 },
-  { id: "usdt", name: "USDT", icon: "#usdt", available: 30, apy: 8.54 },
-  { id: "eth", name: "ETH", icon: "#eth", available: 15, apy: 5.4 },
+  { id: "usdc", name: "USDC", network: "ethereum", icon: "#usdc", available: 100, apy: 23.78, borrowed: 0.01 },
+  { id: "btcb", name: "BTCB", network: "ethereum", icon: "#btc", available: 10, apy: 0.27 },
+  { id: "bnb", name: "BNB", network: "ethereum", icon: "#bnb", available: 20, apy: 1.96 },
+  { id: "usdt", name: "USDT", network: "ethereum", icon: "#usdt", available: 30, apy: 8.54 },
+  { id: "eth", name: "ETH", network: "ethereum", icon: "#eth", available: 15, apy: 5.4 },
 ];
 interface AssetItem {
   id: string;
@@ -66,7 +65,12 @@ export default function BorrowPage() {
 
   const sortedAssets = [...mockAssets].sort((a, b) => {
     if (!sortBy) return 0;
-    return ascending ? a[sortBy] - b[sortBy] : b[sortBy] - a[sortBy];
+    if (typeof a[sortBy] === 'string' && typeof b[sortBy] === 'string') {
+      return ascending ? a[sortBy].localeCompare(b[sortBy]) : b[sortBy].localeCompare(a[sortBy]);
+    }
+    const aValue = a[sortBy] ?? 0;
+    const bValue = b[sortBy] ?? 0;
+    return ascending ? Number(aValue) - Number(bValue) : Number(bValue) - Number(aValue);
   });
   const filteredAssets = sortedAssets.filter((asset) =>
     asset.name.toLowerCase().includes(search.toLowerCase())
