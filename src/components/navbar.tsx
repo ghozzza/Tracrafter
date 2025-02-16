@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { PiggyBank, LineChart, Menu, X } from "lucide-react";
+import { PiggyBank, LineChart, Menu, X, LayoutDashboard } from "lucide-react";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 
@@ -95,12 +95,16 @@ const Navbar: React.FC = () => {
           </Link>
           <div className="hidden md:flex items-center space-x-6">
             <NavLink href="/lending">
-              <LineChart className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              <LineChart className="h-3 w-3 group-hover:scale-110 transition-transform" />
               <span>Lending</span>
             </NavLink>
             <NavLink href="/borrow">
-              <PiggyBank className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              <PiggyBank className="h-3 w-3 group-hover:scale-110 transition-transform" />
               <span>Borrow</span>
+            </NavLink>
+            <NavLink href="/lendingpool">
+              <LayoutDashboard className="h-3 w-3 group-hover:scale-110 transition-transform" />
+              <span>Dashboard</span>
             </NavLink>
           </div>
         </div>
@@ -114,7 +118,7 @@ const Navbar: React.FC = () => {
           aria-label="Toggle menu"
           type="button"
         >
-          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-4 h-4" />}
         </button>
 
         {isOpen && (
@@ -140,7 +144,7 @@ const Navbar: React.FC = () => {
                   aria-label="Close menu"
                   type="button"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
