@@ -13,7 +13,7 @@ export default function LendingPage() {
   const [activeTab, setActiveTab] = useState("pool");
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950">
+    <div className="min-h-screen mt-10">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-100 mb-2">
