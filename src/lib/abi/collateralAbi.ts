@@ -1,4 +1,4 @@
-export const collateralAbi = [
+export const factoryAbi = [
   {
     anonymous: false,
     inputs: [
