@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { factoryAbi } from "@/lib/abi/collateralAbi";
+import { factory } from "../../../../utils/contractAddress";
 
 const TOKEN_OPTIONS = [
   { name: "WETH", address: "0xa7A93C5F0691a5582BAB12C0dE7081C499aECE7f" },
@@ -24,7 +25,8 @@ const USDC_ADDRESS = "0xA61Eb0D33B5d69DC0D0CE25058785796296b1FBd";
 
 export default function CreatePool() {
   const [token1, setToken1] = useState("");
-  const [ltv, setLtv] = useState("");
+  const [ltv, setLtv] = useState<number>(0);
+  const [showFail, setShowFail] = useState<boolean>(false);
 
   const {
     data: hashTransaction,
@@ -38,19 +40,27 @@ export default function CreatePool() {
     });
 
   const handleCreatePool = async () => {
-    await writeTransaction({
-      abi: factoryAbi,
-      address: "0x5d863542d39F1A6937F212Efa1678E7609b71156",
-      functionName: "createLendingPool",
-      args: [token1, USDC_ADDRESS, BigInt(ltv)], // USDC is fixed as token2
-    });
+    let newLtv = Number(ltv) * 10 ** 16;
+  
+      await writeTransaction({
+        abi: factoryAbi,
+        address: factory,
+        functionName: "createLendingPool",
+        args: [token1, USDC_ADDRESS, BigInt(newLtv)], // USDC is fixed as token2
+      });
+  };
+
+  const handleLTV = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (Number(e.target.value) <= 70) {
+      setLtv(Number(e.target.value));
+    }
   };
 
   useEffect(() => {
     if (isSuccess) {
       // Reset form to default values after successful transaction
       setToken1("");
-      setLtv("");
+      setLtv(0);
     }
   }, [isSuccess]);
 
@@ -87,13 +97,11 @@ export default function CreatePool() {
       <Label htmlFor="ltv">LTV</Label>
       <Input
         id="ltv"
-        type="number"
-        value={ltv}
-        onChange={(e) => setLtv(e.target.value)}
+        value={ltv !== 0 ? ltv : ""}
+        onChange={handleLTV}
         disabled={isButtonDisabled}
         placeholder="1-70"
       />
-
       <Button onClick={handleCreatePool} disabled={isButtonDisabled}>
         {isButtonDisabled ? "Processing..." : "Create Lending Pool"}
       </Button>
