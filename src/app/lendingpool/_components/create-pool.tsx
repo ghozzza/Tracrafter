@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,22 +10,21 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"; // Assuming you're using shadcn/ui
+} from "@/components/ui/select";
 import { factoryAbi } from "@/lib/abi/collateralAbi";
 
-// Hardcoded token options
 const TOKEN_OPTIONS = [
   { name: "WETH", address: "0xa7A93C5F0691a5582BAB12C0dE7081C499aECE7f" },
   { name: "WBTC", address: "0xC014F158EbADce5a8e31f634c0eb062Ce8CDaeFe" },
   { name: "PEPE", address: "0x1E713E704336094585c3e8228d5A8d82684e4Fb0" },
+  { name: "MANTA", address: "0xe2e80f81589c80cb1d20a7846a350644281e0177" },
 ];
 
-// USDC is the fixed second token
 const USDC_ADDRESS = "0xA61Eb0D33B5d69DC0D0CE25058785796296b1FBd";
 
 export default function CreatePool() {
   const [token1, setToken1] = useState("");
-  const [ltv, setLtv] = useState("0");
+  const [ltv, setLtv] = useState("");
 
   const {
     data: hashTransaction,
@@ -47,15 +46,23 @@ export default function CreatePool() {
     });
   };
 
+  useEffect(() => {
+    if (isSuccess) {
+      // Reset form to default values after successful transaction
+      setToken1("");
+      setLtv("");
+    }
+  }, [isSuccess]);
+
   const isButtonDisabled = isTransactionPending || isTransactionLoading;
 
   return (
     <div className="space-y-4 text-white">
-      {/* Token 1 Select Dropdown */}
       <Label htmlFor="token1">Token 1</Label>
       <Select
         onValueChange={(value) => setToken1(value)}
         disabled={isButtonDisabled}
+        value={token1}
       >
         <SelectTrigger className="bg-gray-800/50 border-gray-700">
           <SelectValue placeholder="Select Token 1" />
@@ -69,7 +76,6 @@ export default function CreatePool() {
         </SelectContent>
       </Select>
 
-      {/* Token 2 is fixed as USDC */}
       <Label htmlFor="token2">Token 2</Label>
       <Input
         id="token2"
@@ -88,12 +94,10 @@ export default function CreatePool() {
         placeholder="1-70"
       />
 
-      {/* Create Pool Button */}
       <Button onClick={handleCreatePool} disabled={isButtonDisabled}>
         {isButtonDisabled ? "Processing..." : "Create Lending Pool"}
       </Button>
 
-      {/* Display transaction hash after success */}
       {isSuccess && hashTransaction && (
         <div className="mt-4">
           <p className="text-sm text-gray-400">Transaction Hash:</p>
