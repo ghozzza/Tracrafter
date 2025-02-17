@@ -1,1 +1,1 @@
-export const factory = "0x2F08671bf27Ab14E6Baea151A89Cd63dF22F2fD4";
+export const factory = "0x2581acd5925797CFbC1E4D4F7F7C0F84CCcDf874";
