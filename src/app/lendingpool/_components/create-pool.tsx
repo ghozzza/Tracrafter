@@ -58,7 +58,7 @@ export default function CreatePool() {
 
   useEffect(() => {
     if (isSuccess) {
-      // Reset form to default values after successful transaction
+      // Reset form to default values after successful transaction.
       setToken1("");
       setLtv(0);
     }
