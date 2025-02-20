@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect } from "react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -24,12 +26,29 @@ import {
 import { factoryAbi } from "@/lib/abi/collateralAbi";
 import { factory } from "@/lib/utils/contractAddress";
 import SupplyDialog from "./supply-dialog";
+import Image from "next/image";
 
 const TOKEN_OPTIONS = [
-  { name: "WETH", address: "0xa7A93C5F0691a5582BAB12C0dE7081C499aECE7f" },
-  { name: "WBTC", address: "0xC014F158EbADce5a8e31f634c0eb062Ce8CDaeFe" },
-  { name: "PEPE", address: "0x1E713E704336094585c3e8228d5A8d82684e4Fb0" },
-  { name: "MANTA", address: "0xe2e80f81589c80cb1d20a7846a350644281e0177" },
+  {
+    name: "WETH",
+    address: "0xa7A93C5F0691a5582BAB12C0dE7081C499aECE7f",
+    logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png",
+  },
+  {
+    name: "WBTC",
+    address: "0xC014F158EbADce5a8e31f634c0eb062Ce8CDaeFe",
+    logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png",
+  },
+  {
+    name: "PEPE",
+    address: "0x1E713E704336094585c3e8228d5A8d82684e4Fb0",
+    logo: "https://assets.coingecko.com/coins/images/29850/small/pepe-token.jpeg",
+  },
+  {
+    name: "MANTA",
+    address: "0xe2e80f81589c80cb1d20a7846a350644281e0177",
+    logo: "https://assets.coingecko.com/coins/images/32427/small/manta.png",
+  },
 ];
 
 const USDC_ADDRESS = "0xA61Eb0D33B5d69DC0D0CE25058785796296b1FBd";
@@ -38,6 +57,7 @@ const SAMPLE_POOLS = [
   {
     id: 1,
     token: "WETH",
+    logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png",
     liquidity: "31.79M",
     apy: "14.45",
     duration: "7 days",
@@ -45,6 +65,7 @@ const SAMPLE_POOLS = [
   {
     id: 2,
     token: "WBTC",
+    logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png",
     liquidity: "134.77M",
     apy: "16.19",
     duration: "35 days",
@@ -52,6 +73,7 @@ const SAMPLE_POOLS = [
   {
     id: 3,
     token: "PEPE",
+    logo: "https://assets.coingecko.com/coins/images/29850/small/pepe-token.jpeg",
     liquidity: "36.82M",
     apy: "4.025",
     duration: "35 days",
@@ -59,6 +81,7 @@ const SAMPLE_POOLS = [
   {
     id: 4,
     token: "MANTA",
+    logo: "https://assets.coingecko.com/coins/images/32427/small/manta.png",
     liquidity: "3.51M",
     apy: "16.03",
     duration: "56 days",
@@ -149,7 +172,16 @@ export default function LendingPool() {
                       className="border-gray-800 hover:bg-gray-900/50"
                     >
                       <TableCell className="font-medium text-white">
-                        {pool.token}
+                        <div className="flex items-center gap-2">
+                          <Image
+                            src={pool.logo || "/placeholder.svg"}
+                            alt={`${pool.token} logo`}
+                            width={24}
+                            height={24}
+                            className="rounded-full"
+                          />
+                          {pool.token}
+                        </div>
                       </TableCell>
                       <TableCell className="text-gray-300">
                         {pool.duration}
