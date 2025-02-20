@@ -47,7 +47,7 @@ const TOKEN_OPTIONS = [
   {
     name: "MANTA",
     address: "0xe2e80f81589c80cb1d20a7846a350644281e0177",
-    logo: "https://assets.coingecko.com/coins/images/32427/small/manta.png",
+    logo: "https://s1.coincarp.com/logo/1/mantanetwork.png?style=200&v=1687922197",
   },
 ];
 
@@ -81,7 +81,7 @@ const SAMPLE_POOLS = [
   {
     id: 4,
     token: "MANTA",
-    logo: "https://assets.coingecko.com/coins/images/32427/small/manta.png",
+    logo: "https://s1.coincarp.com/logo/1/mantanetwork.png?style=200&v=1687922197",
     liquidity: "3.51M",
     apy: "16.03",
     duration: "56 days",
