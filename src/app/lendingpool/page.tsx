@@ -15,15 +15,6 @@ export default function LendingPage() {
   return (
     <div className="min-h-screen mt-10">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-100 mb-2">
-            Lending Dashboard
-          </h1>
-          <p className="text-gray-400">
-            Manage your lending pools and positions
-          </p>
-        </div>
-
         <Card className="border-gray-800 bg-gray-900/50 backdrop-blur-sm">
           <CardHeader className="border-b border-gray-800">
             <Tabs

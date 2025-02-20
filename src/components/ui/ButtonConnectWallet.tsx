@@ -90,9 +90,9 @@ const ButtonConnectWallet = () => {
                 hover:shadow-[0_0_20px_rgba(79,70,229,0.4)] hover:scale-[1.02] border border-[#3f3f9f]/30"
             >
               <span>{account.displayName}</span>
-              <span>
+              {/* <span>
                 {account.displayBalance ? ` (${account.displayBalance})` : ""}
-              </span>
+              </span> */}
             </button>
             <div
               className="absolute inset-0 -z-10 bg-gradient-to-r from-[#b721ff]/20 to-[#21d4fd]/20 
