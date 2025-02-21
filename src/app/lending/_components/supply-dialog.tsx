@@ -8,7 +8,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import WalletBalance from "./get-balance";
+import WalletBalance from "../../../components/get-balance";
+import { lendingAbi } from "@/lib/abi/lendingAbi";
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { lendingPool } from "@/constants/addresses";
 
 interface SupplyDialogProps {
   poolId: number;
@@ -20,10 +23,26 @@ const SupplyDialog = ({ poolId, token, apy }: SupplyDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [supplyAmount, setSupplyAmount] = useState("");
 
-  const handleSupply = async () => {
-    console.log(`Supplying ${supplyAmount} ${token} to pool ${poolId}`);
-    setSupplyAmount("");
-    setIsOpen(false);
+  const {
+    data: hashTransction,
+    isPending: isTransctionPending,
+    writeContract: writeTransaction,
+  } = useWriteContract();
+  const { isLoading: isTransactionLoading } = useWaitForTransactionReceipt({
+    hash: hashTransction,
+  });
+  const handleTransaction = async () => {
+    if (!supplyAmount) return;
+    try {
+      await writeTransaction({
+        abi: lendingAbi,
+        address: lendingPool,
+        functionName: "supply",
+        args: [BigInt(supplyAmount)],
+      });
+    } catch (error) {
+      console.error("Transaction failed:", error);
+    }
   };
 
   return (
@@ -67,10 +86,10 @@ const SupplyDialog = ({ poolId, token, apy }: SupplyDialogProps) => {
             </div>
 
             <Button
-              onClick={handleSupply}
+              onClick={handleTransaction}
               className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/20"
             >
-              Confirm Supply
+              confirm supply
             </Button>
           </div>
         </DialogContent>

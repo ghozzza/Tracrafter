@@ -9,6 +9,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { config } from "../lib/wagmi";
 import Navbar from "@/components/navbar";
 import { useState } from "react";
+import { Toaster } from 'sonner'
 
 // Initialize fonts
 const geistSans = Geist({
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
                   <Navbar />
                 </div>
                 <div className="mt-5">{children}</div>
+                <Toaster />
               </div>
             </RainbowKitProvider>
           </QueryClientProvider>

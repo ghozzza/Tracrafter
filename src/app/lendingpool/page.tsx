@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import CreatePool from "./_components/create-pool";
+import CreatePool from "../lending/_components/create-pool";
 import CreatePosition from "./_components/create-position";
 import Operations from "./_components/operations";
 import { CoinsIcon, LayersIcon, Settings2Icon } from "lucide-react";

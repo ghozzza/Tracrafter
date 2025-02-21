@@ -1,10 +1,10 @@
 import React from "react";
-import LendingPage from "./lending";
+import LendingPool from "./_components/create-pool";
 
 function PageLending() {
   return (
     <div>
-      <LendingPage />
+      <LendingPool />
     </div>
   );
 }
