@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import WalletBalance from "../../../components/get-balance";
-import { lendingAbi } from "@/lib/abi/lendingAbi";
+import { poolAbi } from "@/lib/abi/poolAbi";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { lendingPool } from "@/constants/addresses";
 
@@ -35,7 +35,7 @@ const SupplyDialog = ({ poolId, token, apy }: SupplyDialogProps) => {
     if (!supplyAmount) return;
     try {
       await writeTransaction({
-        abi: lendingAbi,
+        abi: poolAbi,
         address: lendingPool,
         functionName: "supply",
         args: [BigInt(supplyAmount)],

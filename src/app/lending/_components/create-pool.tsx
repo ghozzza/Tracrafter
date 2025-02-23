@@ -21,8 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { factoryAbi } from "@/lib/abi/collateralAbi";
-import { factory } from "@/constants/addresses";
+import { factoryAbi } from "@/lib/abi/factoryAbi";
+import { factory,hxAddress } from "@/constants/addresses";
 import { TOKEN_OPTIONS } from "@/constants/tokenOption";
 import { SAMPLE_POOLS } from "@/constants/pools";
 import SupplyDialog from "./supply-dialog";
@@ -44,7 +44,6 @@ export default function LendingPool() {
       hash: hashTransaction,
     });
 
-  // Filter token options based on selected tokens
   const filteredToken1Options = TOKEN_OPTIONS.filter(
     (token) => token.address !== token2
   );
@@ -195,7 +194,7 @@ export default function LendingPool() {
                 <div className="mt-4">
                   <p className="text-gray-400">Transaction Hash:</p>
                   <a
-                    href={`https://pacific-explorer.sepolia-testnet.manta.network/tx/${hashTransaction}`}
+                    href={`${hxAddress}${hashTransaction}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:text-blue-300 break-all"

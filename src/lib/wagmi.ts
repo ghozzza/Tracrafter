@@ -1,16 +1,34 @@
 import { http } from "wagmi";
-import { arbitrum, baseSepolia, mantaSepoliaTestnet, optimismSepolia } from "wagmi/chains";
 import { createConfig } from "wagmi";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
+import { defineChain } from "viem";
+import LogoEth from '../../public/eth2.jpg'
+
+
+
+const myCustomChain = defineChain({
+  id: 11155931,
+  name: "Rise Sepolia",
+  nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+  rpcUrls: {
+    default: { http: ["https://testnet.riselabs.xyz"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "Riselabs",
+      url: "https://testnet-explorer.riselabs.xyz/",
+      apiUrl: "https://testnet-explorer.riselabs.xyz/api",
+    },
+  },
+  testnet: true,
+  // iconUrl:LogoEth,
+});
 
 export const config = getDefaultConfig({
   appName: "MyDApp",
-  projectId: "YOUR_PROJECT_ID", // Get from WalletConnect Cloud
-  chains: [baseSepolia, arbitrum, mantaSepoliaTestnet,optimismSepolia],
+  projectId: "YOUR_PROJECT_ID",
+  chains: [myCustomChain],
   transports: {
-    [baseSepolia.id]: http(),
-    [arbitrum.id]: http(),
-    [mantaSepoliaTestnet.id]: http(),
-    [optimismSepolia.id]: http(),
+    [myCustomChain.id]: http(),
   },
 });

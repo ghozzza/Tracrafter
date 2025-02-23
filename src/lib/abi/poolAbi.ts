@@ -1,4 +1,4 @@
-export const lendingAbi = [
+export const poolAbi = [
   {
     inputs: [
       { internalType: "address", name: "_collateralToken", type: "address" },

@@ -104,7 +104,7 @@ const Navbar: React.FC = () => {
             </NavLink>
             <NavLink href="/lendingpool">
               <LayoutDashboard className="h-3 w-3 group-hover:scale-110 transition-transform" />
-              <span>Dashboard</span>
+              <span>Trade</span>
             </NavLink>
           </div>
         </div>
