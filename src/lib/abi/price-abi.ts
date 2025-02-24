@@ -347,6 +347,35 @@ export const priceAbi = [
     inputs: [
       {
         internalType: "address",
+        name: "_tokenFrom",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_tokenTo",
+        type: "address",
+      },
+    ],
+    name: "getPriceTrade",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "_token",
         type: "address",
       },
