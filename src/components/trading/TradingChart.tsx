@@ -1,61 +1,127 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createChart, ColorType, IChartApi, CandlestickData } from 'lightweight-charts';
 
+const BINANCE_REST_API = 'https://api.binance.com/api/v3';
+const BINANCE_WS_API = 'wss://stream.binance.com:9443/ws';
+
 export default function TradingChart() {
-  const chartContainerRef = React.useRef<HTMLDivElement>(null);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<IChartApi | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
+  const candleSeriesRef = useRef<any>(null);
+  const [symbol] = useState('btcusdt'); // Bisa dibuat dinamis nanti
+  const [interval] = useState('1m'); // 1 menit candlestick
 
-  React.useEffect(() => {
-    if (chartContainerRef.current) {
-      const chart: IChartApi = createChart(chartContainerRef.current, {
-        layout: {
-          background: { type: ColorType.Solid, color: 'transparent' },
-          textColor: '#DDD',
-        },
-        grid: {
-          vertLines: { color: '#2B2B43' },
-          horzLines: { color: '#2B2B43' },
-        },
-        width: chartContainerRef.current.clientWidth,
-        height: 400,
-      });
+  // Fungsi untuk mengambil data historis
+  const fetchHistoricalData = async () => {
+    try {
+      const response = await fetch(
+        `${BINANCE_REST_API}/klines?symbol=${symbol.toUpperCase()}&interval=${interval}&limit=1000`
+      );
+      const data = await response.json();
+      
+      return data.map((d: any) => ({
+        time: d[0] / 1000,
+        open: parseFloat(d[1]),
+        high: parseFloat(d[2]),
+        low: parseFloat(d[3]),
+        close: parseFloat(d[4])
+      }));
+    } catch (error) {
+      console.error('Error fetching historical data:', error);
+      return [];
+    }
+  };
 
-      const candleSeries = chart.addCandlestickSeries({
-        upColor: '#26a69a',
-        downColor: '#ef5350',
-        borderVisible: false,
-        wickUpColor: '#26a69a',
-        wickDownColor: '#ef5350'
-      });
+  // Setup chart dan WebSocket
+  useEffect(() => {
+    if (!chartContainerRef.current) return;
 
-      const data: CandlestickData[] = [
-        { time: '2023-01-01' as string, open: 100, high: 105, low: 95, close: 102 },
-        { time: '2023-01-02' as string, open: 102, high: 108, low: 100, close: 105 },
-        { time: '2023-01-03' as string, open: 105, high: 110, low: 101, close: 109 },
-        { time: '2023-01-04' as string, open: 109, high: 115, low: 107, close: 110 },
-        { time: '2023-01-05' as string, open: 110, high: 112, low: 105, close: 107 },
-      ];
+    // Inisialisasi chart
+    const chart = createChart(chartContainerRef.current, {
+      layout: {
+        background: { type: ColorType.Solid, color: 'transparent' },
+        textColor: '#DDD',
+      },
+      grid: {
+        vertLines: { color: '#2B2B43' },
+        horzLines: { color: '#2B2B43' },
+      },
+      width: chartContainerRef.current.clientWidth,
+      height: 400,
+    });
+    
+    chartRef.current = chart;
 
+    const candleSeries = chart.addCandlestickSeries({
+      upColor: '#26a69a',
+      downColor: '#ef5350',
+      borderVisible: false,
+      wickUpColor: '#26a69a',
+      wickDownColor: '#ef5350'
+    });
+    
+    candleSeriesRef.current = candleSeries;
+
+    // Ambil data historis
+    fetchHistoricalData().then((data) => {
       candleSeries.setData(data);
       chart.timeScale().fitContent();
+    });
 
-      const handleResize = () => {
-        if (chartContainerRef.current) {
-          chart.applyOptions({
-            width: chartContainerRef.current.clientWidth
-          });
-        }
-      };
+    // Setup WebSocket untuk update real-time
+    const ws = new WebSocket(`${BINANCE_WS_API}/${symbol}@kline_${interval}`);
+    wsRef.current = ws;
 
-      window.addEventListener('resize', handleResize);
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const candle = data.k;
 
-      return () => {
-        window.removeEventListener('resize', handleResize);
-        chart.remove();
-      };
-    }
-  }, []);
+      if (candleSeriesRef.current) {
+        candleSeriesRef.current.update({
+          time: candle.t / 1000,
+          open: parseFloat(candle.o),
+          high: parseFloat(candle.h),
+          low: parseFloat(candle.l),
+          close: parseFloat(candle.c)
+        });
+      }
+    };
 
-  return <div ref={chartContainerRef} className="w-full h-[400px]" />;
+    // Handle resize
+    const handleResize = () => {
+      if (chartContainerRef.current && chartRef.current) {
+        chartRef.current.applyOptions({
+          width: chartContainerRef.current.clientWidth
+        });
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+      if (chartRef.current) {
+        chartRef.current.remove();
+      }
+    };
+  }, [symbol, interval]);
+
+  return (
+    <div className="w-full">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold text-white">BTC/USDT</h2>
+        <div className="text-sm text-gray-400">
+          1 Minute Chart
+        </div>
+      </div>
+      <div ref={chartContainerRef} className="w-full h-[400px]" />
+    </div>
+  );
 } 
