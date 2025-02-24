@@ -5,8 +5,6 @@ import { defineChain } from "viem";
 import LogoEth from '../../public/eth2.jpg'
 import { optimismSepolia } from "viem/chains";
 
-
-
 const myCustomChain = defineChain({
   id: 11155931,
   name: "Rise Sepolia",

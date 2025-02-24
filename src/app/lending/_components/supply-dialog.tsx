@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/dialog";
 import WalletBalance from "../../../components/get-balance";
 import { poolAbi } from "@/lib/abi/poolAbi";
+import { mockErc20Abi } from "@/lib/abi/mockErc20Abi"; // ABI untuk ERC20 (approve)
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { lendingPool } from "@/constants/addresses";
+import { lendingPool, mockUsdc, mockWbtc } from "@/constants/addresses";
 
 interface SupplyDialogProps {
   poolId: number;
@@ -24,24 +25,61 @@ const SupplyDialog = ({ poolId, token, apy }: SupplyDialogProps) => {
   const [supplyAmount, setSupplyAmount] = useState("");
 
   const {
-    data: hashTransction,
-    isPending: isTransctionPending,
-    writeContract: writeTransaction,
+    data: approveHash,
+    isPending: isApprovePending,
+    writeContract: approveTransaction,
   } = useWriteContract();
-  const { isLoading: isTransactionLoading } = useWaitForTransactionReceipt({
-    hash: hashTransction,
+
+  const {
+    data: supplyHash,
+    isPending: isSupplyPending,
+    writeContract: supplyTransaction,
+  } = useWriteContract();
+
+  const { isLoading: isApproveLoading } = useWaitForTransactionReceipt({
+    hash: approveHash,
   });
+
+  const { isLoading: isSupplyLoading } = useWaitForTransactionReceipt({
+    hash: supplyHash,
+  });
+
   const handleTransaction = async () => {
-    if (!supplyAmount) return;
+    if (!supplyAmount || isNaN(Number(supplyAmount))) {
+      console.error("Invalid supply amount");
+      return;
+    }
+
+    const supplyAmountBigInt = BigInt(Number(supplyAmount) * 10 ** 6);
+
     try {
-      await writeTransaction({
+      console.log("⏳ Sending approval transaction...");
+
+      await approveTransaction({
+        abi: mockErc20Abi,
+        address: mockUsdc,
+        functionName: "approve",
+        args: [lendingPool, supplyAmountBigInt],
+      });
+
+      console.log("✅ Approval transaction sent, waiting for confirmation...");
+
+      // Tunggu transaksi approve selesai
+      await new Promise((resolve) => setTimeout(resolve, 5000)); // Delay sementara (bisa diganti polling tx status)
+
+      console.log("✅ Approval confirmed, proceeding with supply...");
+
+      // Step 2: Supply setelah approve berhasil
+      await supplyTransaction({
         abi: poolAbi,
         address: lendingPool,
         functionName: "supply",
-        args: [BigInt(supplyAmount)],
+        args: [supplyAmountBigInt],
       });
+
+      console.log("🚀 Supply transaction sent!");
     } catch (error) {
-      console.error("Transaction failed:", error);
+      console.error("❌ Transaction failed:", error);
     }
   };
 
@@ -87,9 +125,14 @@ const SupplyDialog = ({ poolId, token, apy }: SupplyDialogProps) => {
 
             <Button
               onClick={handleTransaction}
+              disabled={isApprovePending || isSupplyPending}
               className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/20"
             >
-              confirm supply
+              {isApproveLoading
+                ? "Approving..."
+                : isSupplyLoading
+                ? "Supplying..."
+                : "Confirm Supply"}
             </Button>
           </div>
         </DialogContent>

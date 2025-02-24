@@ -22,11 +22,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { factoryAbi } from "@/lib/abi/factoryAbi";
-import { factory,hxAddress } from "@/constants/addresses";
+import { factory, hxAddress } from "@/constants/addresses";
 import { TOKEN_OPTIONS } from "@/constants/tokenOption";
 import { SAMPLE_POOLS } from "@/constants/pools";
 import SupplyDialog from "./supply-dialog";
 import Image from "next/image";
+import MintMockWETH from "./mint";
+import { toast } from "sonner";
 
 export default function LendingPool() {
   const [token1, setToken1] = useState("");
@@ -52,13 +54,27 @@ export default function LendingPool() {
   );
 
   const handleCreatePool = async () => {
-    const newLtv = Number(ltv) * 10 ** 16;
-    await writeTransaction({
-      abi: factoryAbi,
-      address: factory,
-      functionName: "createLendingPool",
-      args: [token1, token2, BigInt(newLtv)],
-    });
+    if (!token1 || !token2 || ltv <= 0) {
+      toast.error("Please select valid tokens and LTV.");
+      return;
+    }
+
+    try {
+      const newLtv = BigInt(Number(ltv) * 10 ** 16);
+      console.log("Executing transaction with:", { token1, token2, newLtv });
+
+      await writeTransaction({
+        abi: factoryAbi,
+        address: factory,
+        functionName: "createLendingPool",
+        args: [token1, token2, newLtv],
+      });
+
+      toast.success("Transaction submitted!");
+    } catch (error) {
+      console.error("Transaction failed:", error);
+      toast.error("Transaction failed. Please try again.");
+    }
   };
 
   const handleLTV = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,12 +98,6 @@ export default function LendingPool() {
       <div className="max-w-4xl mx-auto">
         <Tabs defaultValue="create" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-background/50 backdrop-blur">
-            <TabsTrigger
-              value="create"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white"
-            >
-              Create Pool
-            </TabsTrigger>
             <TabsTrigger
               value="pools"
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white"
@@ -264,6 +274,7 @@ export default function LendingPool() {
           </TabsContent>
         </Tabs>
       </div>
+      {/* <MintMockWETH /> */}
     </div>
   );
 }
