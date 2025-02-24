@@ -106,6 +106,10 @@ const Navbar: React.FC = () => {
               <LayoutDashboard className="h-3 w-3 group-hover:scale-110 transition-transform" />
               <span>Dashboard</span>
             </NavLink>
+            <NavLink href="/dummy">
+              <LayoutDashboard className="h-3 w-3 group-hover:scale-110 transition-transform" />
+              <span>Dummy</span>
+            </NavLink>
           </div>
         </div>
         <div className="hidden md:flex items-center space-x-6">
@@ -157,6 +161,11 @@ const Navbar: React.FC = () => {
                 <NavLink href="/lending" onClick={closeMenu}>
                   <LineChart className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   <span>Lending</span>
+                </NavLink>
+
+                <NavLink href="/dummy" onClick={closeMenu}>
+                  <LayoutDashboard className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <span>Dummy</span>
                 </NavLink>
 
                 <div className="px-6 pt-4 mt-4 border-t border-white/10">
