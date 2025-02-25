@@ -42,7 +42,6 @@ import { useReadContract } from "wagmi";
 import Image from "next/image";
 import { toast } from "sonner";
 import { poolAbi } from "@/lib/abi/poolAbi";
-import CreatePosition from "./createPosition";
 
 const tokens = [
   {
