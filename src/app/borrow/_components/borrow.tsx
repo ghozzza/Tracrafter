@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import BorrowToken from "./token-supply";
 import AssetsToBorrow from "./asset-to-borrow";
+import { BorrowBalance } from "@/components/user-balance/borrow-balance";
 
 interface AssetItem {
   id: string;
@@ -48,6 +49,7 @@ export default function BorrowPage() {
             <h1>Borrow</h1>
             <h1>
               <BorrowToken />
+              <BorrowBalance />
             </h1>
           </div>
           <p className="text-slate-400">The Best DeFi Yields In 1-Click</p>
@@ -183,7 +185,7 @@ export default function BorrowPage() {
           )}
         </Card>
 
-        <AssetsToBorrow assets={mockAssets} />
+        <AssetsToBorrow />
       </div>
     </div>
   );

@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import { poolAbi } from "@/lib/abi/poolAbi";
 import { lendingPool } from "@/constants/addresses";
 import { Loader2 } from "lucide-react";
@@ -66,7 +65,7 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
   const handleBorrow = async () => {
     try {
       if (!amount || parseFloat(amount) <= 0) {
-        toast.error("Please enter a valid borrow amount");
+        console.error("Please enter a valid borrow amount");
         return;
       }
 
@@ -75,7 +74,6 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
 
       if (!hasPosition) {
         console.log("🚀 Creating Position...");
-        toast.loading("Creating position...");
 
         await writeContract({
           address: lendingPool,
@@ -84,15 +82,12 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
           args: [],
         });
 
-        toast.dismiss();
-        toast.success("Position created successfully!");
+        console.log("Position created successfully!");
         await refetchPosition();
       }
 
       console.log("💰 Borrowing...");
-      toast.loading(`Borrowing ${token}...`);
 
-      
       await writeContract({
         address: lendingPool,
         abi: poolAbi,
@@ -100,13 +95,10 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
         args: [parsedAmount],
       });
 
-      toast.dismiss();
-      toast.success(`Successfully borrowed ${amount} ${token}!`);
+      console.log(`Successfully borrowed ${amount} ${token}!`);
       setAmount("");
     } catch (error) {
       console.error("Borrow error:", error);
-      toast.dismiss();
-      toast.error("Failed to borrow");
     }
   };
 

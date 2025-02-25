@@ -18,7 +18,6 @@ const WalletBalance = () => {
     setMounted(true);
   }, []);
 
-  // Render placeholder selama belum mounted untuk mencegah hydration error
   if (!mounted) {
     return <div className="p-4 rounded-lg">Loading wallet info...</div>;
   }

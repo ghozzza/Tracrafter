@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import BorrowDialog from "./borrow-dialog";
 import { useReadContract } from "wagmi";
@@ -13,18 +15,11 @@ interface AssetItem {
   apy: number;
 }
 
-interface AssetsToBorrowProps {
-  assets: AssetItem[];
-}
-
-export default function AssetsToBorrow({ assets }: AssetsToBorrowProps) {
+export default function AssetsToBorrow() {
   const [hasPosition, setHasPosition] = useState(false);
-  const [collateralBalances, setCollateralBalances] = useState<
-    Record<string, string>
-  >({});
+  const [collateralBalance, setCollateralBalance] = useState<string>("0");
 
-  // Cek apakah user memiliki posisi
-  const { data: positionAddress, refetch: refetchPosition } = useReadContract({
+  const { data: positionAddress } = useReadContract({
     address: lendingPool,
     abi: poolAbi,
     functionName: "addressPosition",
@@ -35,6 +30,7 @@ export default function AssetsToBorrow({ assets }: AssetsToBorrowProps) {
     ],
   });
 
+  // Gunakan hook useEffect untuk mendeteksi perubahan posisi
   useEffect(() => {
     if (
       positionAddress &&
@@ -46,63 +42,50 @@ export default function AssetsToBorrow({ assets }: AssetsToBorrowProps) {
     }
   }, [positionAddress]);
 
-  // Ambil saldo collateral
+  // Pisahkan useReadContract untuk membaca saldo collateral
+  const { data: balance } = useReadContract({
+    address: lendingPool,
+    abi: poolAbi,
+    functionName: "getTokenBalancesByPosition",
+    args: hasPosition ? [positionAddress, "WBTC"] : undefined, // Hanya jalankan jika ada posisi
+  });
+
   useEffect(() => {
-    if (hasPosition) {
-      assets.forEach(async (asset) => {
-        const { data: balance } = await useReadContract({
-          address: lendingPool,
-          abi: poolAbi,
-          functionName: "getTokenBalancesByPosition",
-          args: [positionAddress, asset.name],
-        });
-        setCollateralBalances((prev) => ({
-          ...prev,
-          [asset.name]: balance?.toString() || "0",
-        }));
-      });
+    if (balance) {
+      setCollateralBalance(balance.toString());
     }
-  }, [hasPosition, assets]);
+  }, [balance]);
 
   return (
-    <Card className="bg-slate-900/50 border-none shadow-xl">
-      <CardHeader className="pb-2">
+    <Card className="bg-slate-900/50 border-none shadow-xl p-4">
+      <CardHeader>
         <CardTitle className="text-xl font-medium text-slate-200">
-          Assets to Borrow
+          Lending Pool
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-1">
-          <div className="grid grid-cols-12 gap-4 px-4 py-2 text-sm text-slate-400">
-            <div className="col-span-3">Asset</div>
-            <div className="col-span-2">Available</div>
-            <div className="col-span-2">APY</div>
-            <div className="col-span-3">Collateral</div>
-            <div className="col-span-2">Action</div>
+      <CardContent className="space-y-4">
+        <div className="text-slate-300 text-lg font-semibold">Supply</div>
+        <div className="grid grid-cols-12 gap-4 bg-[#31323d] p-4 rounded-lg">
+          <div className="col-span-4 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-white/10" />
+            <span className="font-medium text-slate-400">WETH</span>
           </div>
+          <div className="col-span-4 text-slate-400">{collateralBalance}</div>
+          <div className="col-span-4 flex justify-end">
+            <SupplyDialog token="WBTC" />
+          </div>
+        </div>
 
-          {assets.map((asset) => (
-            <div
-              key={asset.id}
-              className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-[#31323d] rounded-lg"
-            >
-              <div className="col-span-3 flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-white/10" />
-                <span className="font-medium text-slate-400">{asset.name}</span>
-              </div>
-              <div className="col-span-2 text-slate-400">{asset.available}</div>
-              <div className="col-span-2 text-slate-400">{asset.apy}%</div>
-              <div className="col-span-3 text-slate-400">
-                {collateralBalances[asset.name] || "0"}
-              </div>
-              <div className="col-span-2 flex gap-2">
-                <SupplyDialog token={asset.name} />
-              </div>
-              <div className="col-span-2 flex gap-2">
-                <BorrowDialog token={asset.name} />
-              </div>
-            </div>
-          ))}
+        <div className="text-slate-300 text-lg font-semibold mt-6">Borrow</div>
+        <div className="grid grid-cols-12 gap-4 bg-[#31323d] p-4 rounded-lg">
+          <div className="col-span-4 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-white/10" />
+            <span className="font-medium text-slate-400">USDC</span>
+          </div>
+          <div className="col-span-4 text-slate-400">-</div>
+          <div className="col-span-4 flex justify-end">
+            <BorrowDialog token="USDC" />
+          </div>
         </div>
       </CardContent>
     </Card>
