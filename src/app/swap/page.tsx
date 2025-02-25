@@ -95,6 +95,7 @@ export default function TokenSwap() {
             (Number(price) * fromAmount) / Number(decimal)
           }`
         : isReading;
+        // fromAmount * decimal
     }
   };
 
