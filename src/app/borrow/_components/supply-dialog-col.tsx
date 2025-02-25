@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useReadContract,
+} from "wagmi";
 import { parseUnits } from "viem";
 import {
   Dialog,
@@ -9,30 +13,76 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { poolAbi } from "@/lib/abi/poolAbi";
-import { lendingPool } from "@/constants/addresses";
+import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
+import { lendingPool, mockWeth } from "@/constants/addresses";
 import { Loader2 } from "lucide-react";
 
 interface SupplyDialogProps {
   token: string;
 }
 
-export default function SupplyDialog({ token }: SupplyDialogProps) {
+export default function SupplyDialogCol({ token }: SupplyDialogProps) {
   const [amount, setAmount] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [hasPosition, setHasPosition] = useState(false);
+
+  const { data: positionAddress, refetch: refetchPosition } = useReadContract({
+    address: lendingPool,
+    abi: poolAbi,
+    functionName: "addressPosition",
+    args: [
+      typeof window !== "undefined"
+        ? (window as any).ethereum?.selectedAddress
+        : undefined,
+    ],
+  });
+
+  useEffect(() => {
+    if (
+      positionAddress &&
+      positionAddress !== "0x0000000000000000000000000000000000000000"
+    ) {
+      setHasPosition(true);
+    } else {
+      setHasPosition(false);
+    }
+  }, [positionAddress]);
 
   const {
-    data: writeHash,
-    writeContract,
-    isPending: isWritePending,
+    data: approveHash,
+    isPending: isApprovePending,
+    writeContract: approveTransaction,
   } = useWriteContract();
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash: writeHash,
+  const {
+    data: supplyHash,
+    isPending: isSupplyPending,
+    writeContract: supplyTransaction,
+  } = useWriteContract();
+
+  const {
+    data: positionHash,
+    isPending: isPositionPending,
+    writeContract: createPositionTransaction,
+  } = useWriteContract();
+
+  const { isLoading: isApproveLoading } = useWaitForTransactionReceipt({
+    hash: approveHash,
+  });
+
+  const { isLoading: isSupplyLoading, isSuccess } =
+    useWaitForTransactionReceipt({
+      hash: supplyHash,
+    });
+
+  const { isLoading: isPositionLoading } = useWaitForTransactionReceipt({
+    hash: positionHash,
   });
 
   const handleSupply = async () => {
@@ -42,18 +92,43 @@ export default function SupplyDialog({ token }: SupplyDialogProps) {
         return;
       }
 
-      const decimals = 18; 
+      const decimals = 18;
       const parsedAmount = parseUnits(amount, decimals);
 
-      console.log("🏦 Supplying collateral...");
+      if (!hasPosition) {
+        toast.loading("Creating position...");
+
+        await createPositionTransaction({
+          address: lendingPool,
+          abi: poolAbi,
+          functionName: "createPosition",
+          args: [],
+        });
+
+        toast.dismiss();
+        toast.success("Position created successfully!");
+        await refetchPosition();
+      }
+
+      toast.loading("Approving token for supply...");
+
+      await approveTransaction({
+        abi: mockErc20Abi,
+        address: mockWeth,
+        functionName: "approve",
+        args: [lendingPool, parsedAmount],
+      });
+
+      toast.dismiss();
       toast.loading(`Supplying ${token} as collateral...`);
 
-      await writeContract({
+      await supplyTransaction({
         address: lendingPool,
         abi: poolAbi,
         functionName: "supplyCollateralByPosition",
         args: [parsedAmount],
       });
+
       toast.dismiss();
       toast.success(`Successfully supplied ${amount} ${token} as collateral!`);
       setAmount("");
@@ -70,7 +145,13 @@ export default function SupplyDialog({ token }: SupplyDialogProps) {
     }
   }, [isSuccess]);
 
-  const isProcessing = isWritePending || isConfirming;
+  const isProcessing =
+    isApprovePending ||
+    isSupplyPending ||
+    isApproveLoading ||
+    isSupplyLoading ||
+    isPositionPending ||
+    isPositionLoading;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -82,6 +163,11 @@ export default function SupplyDialog({ token }: SupplyDialogProps) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Supply {token} as Collateral</DialogTitle>
+          {!hasPosition && (
+            <DialogDescription>
+              You need to create a position before supplying collateral.
+            </DialogDescription>
+          )}
         </DialogHeader>
 
         <div className="space-y-4">

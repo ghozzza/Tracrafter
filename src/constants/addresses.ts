@@ -10,7 +10,3 @@ export const mockWbtc = "0x197E528D15aD6d6B51672Fc3D11FCCcdEedE6cD2" as Address;
 export const mockUsdc = "0x373e1981F97607B4073Ee8bB23e3810CdAAAD1f8" as Address;
 export const mockUsde = "0x7dDB90D42C39AAaE3d79b8Ae8646873EA0Bad3e9" as Address;
 export const hxAddress = "https://testnet-explorer.riselabs.xyz/tx/" as Address;
-
-373974739220035
-
-2673977397

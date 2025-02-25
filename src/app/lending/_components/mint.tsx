@@ -10,11 +10,11 @@ import { Input } from "@/components/ui/input";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { Address } from "viem";
 
-const MOCK_WETH_ADDRESS: Address = "0x373e1981F97607B4073Ee8bB23e3810CdAAAD1f8";
+const MOCK_WETH_ADDRESS: Address = "0x3A6c69259bC97E0912C7a678ca5331A93d2bfA46";
 
 const MintMockWBTC = () => {
   const [mintAmount, setMintAmount] = useState<string>("");
-  const address: Address = "0x597c129eE29d761f4Add79aF124593Be5E0EB77e";
+  const address: Address = "0x35c884a8EeFA2D865A64062CcF5c3303a79b9bc5";
 
   const { data: txHash, writeContract } = useWriteContract();
   const { isLoading: isWaitingForTx } = useWaitForTransactionReceipt({
@@ -32,7 +32,7 @@ const MintMockWBTC = () => {
       return;
     }
 
-    const mintAmountBigInt = BigInt(Number(mintAmount) * 10 ** 8); // WBTC = 8 decimals
+    const mintAmountBigInt = BigInt(Number(mintAmount) * 10 ** 18); // WBTC = 8 decimals
 
     try {
       console.log(`⏳ Minting ${mintAmount} WBTC ke ${address}...`);

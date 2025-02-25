@@ -6,13 +6,14 @@ import {
   useAccount,
 } from "wagmi";
 import { poolAbi } from "@/lib/abi/poolAbi";
+import { lendingPool } from "@/constants/addresses";
 
 const BorrowToken = () => {
   const { address } = useAccount();
 
   const { data: userSupply, isLoading: isReadingSupply } = useReadContract({
     abi: poolAbi,
-    address: "0x0e97Aee95F59B4e5738Be38300364d39297aa991",
+    address: lendingPool,
     functionName: "userSupplyShares",
     args: [address],
   });
