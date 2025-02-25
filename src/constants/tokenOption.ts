@@ -18,6 +18,6 @@ export const TOKEN_OPTIONS: TokenOption[] = [
   {
     name: "USDC",
     address: "0x373e1981F97607B4073Ee8bB23e3810CdAAAD1f8",
-    logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png",
+    logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48/logo.png",
   },
 ];

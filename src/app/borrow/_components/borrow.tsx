@@ -1,33 +1,44 @@
-"use client"
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Settings, ChevronUp, ChevronDown, Wallet } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import BorrowToken from "./token-supply"
-import AssetsToBorrow from "./asset-to-borrow"
+"use client";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Settings, ChevronUp, ChevronDown, Wallet } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import BorrowToken from "./token-supply";
+import AssetsToBorrow from "./asset-to-borrow";
+import { BorrowBalance } from "@/components/user-balance/borrow-balance";
 
 interface AssetItem {
-  id: string
-  name: string
-  network: string
-  icon: string
-  available: number
-  apy: number
-  borrowed?: number
+  id: string;
+  name: string;
+  network: string;
+  icon: string;
+  available: number;
+  apy: number;
+  borrowed?: number;
 }
 
 const mockAssets: AssetItem[] = [
-  { id: "usdc", name: "USDC", network: "ethereum", icon: "#usdc", available: 100, apy: 23.78, borrowed: 0.01 },
-  { id: "btcb", name: "BTCB", network: "ethereum", icon: "#btc", available: 10, apy: 0.27 },
-  { id: "bnb", name: "BNB", network: "ethereum", icon: "#bnb", available: 20, apy: 1.96 },
-  { id: "usdt", name: "USDT", network: "ethereum", icon: "#usdt", available: 30, apy: 8.54 },
-  { id: "eth", name: "ETH", network: "ethereum", icon: "#eth", available: 15, apy: 5.4 },
-]
+  {
+    id: "usdc",
+    name: "USDC",
+    network: "ethereum",
+    icon: "#usdc",
+    available: 100,
+    apy: 23.78,
+    borrowed: 0.01,
+  },
+];
 
 export default function BorrowPage() {
-  const [isExpanded, setIsExpanded] = useState(true)
-  const borrowPowerUsed = 3.13
+  const [isExpanded, setIsExpanded] = useState(true);
+  const borrowPowerUsed = 3.13;
 
   return (
     <div className="min-h-screen p-8">
@@ -38,6 +49,7 @@ export default function BorrowPage() {
             <h1>Borrow</h1>
             <h1>
               <BorrowToken />
+              <BorrowBalance />
             </h1>
           </div>
           <p className="text-slate-400">The Best DeFi Yields In 1-Click</p>
@@ -47,7 +59,9 @@ export default function BorrowPage() {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <CardTitle className="text-xl text-white">Your borrows</CardTitle>
+                <CardTitle className="text-xl text-white">
+                  Your Position
+                </CardTitle>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-slate-400">E-Mode</span>
                   <Button
@@ -60,8 +74,17 @@ export default function BorrowPage() {
                   </Button>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)} className="text-slate-400">
-                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="text-slate-400"
+              >
+                {isExpanded ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </CardHeader>
@@ -70,7 +93,11 @@ export default function BorrowPage() {
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-4">
                   <div className="space-y-1">
-                    <div className="text-sm text-slate-400">Balance</div>
+                    <div className="text-sm text-slate-400">Collateral</div>
+                    <div className="text-lg font-medium text-white">$0.10</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-sm text-slate-400">Debt</div>
                     <div className="text-lg font-medium text-white">$0.01</div>
                   </div>
                   <div className="space-y-1">
@@ -78,8 +105,12 @@ export default function BorrowPage() {
                     <div className="text-lg font-medium text-white">23.78%</div>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-sm text-slate-400">Borrow power used</div>
-                    <div className="text-lg font-medium text-white">{borrowPowerUsed}%</div>
+                    <div className="text-sm text-slate-400">
+                      Borrow power used
+                    </div>
+                    <div className="text-lg font-medium text-white">
+                      {borrowPowerUsed}%
+                    </div>
                   </div>
                 </div>
 
@@ -98,14 +129,21 @@ export default function BorrowPage() {
                       {mockAssets
                         .filter((asset) => asset.borrowed)
                         .map((asset) => (
-                          <tr key={asset.id} className="border-t border-slate-800">
+                          <tr
+                            key={asset.id}
+                            className="border-t border-slate-800"
+                          >
                             <td className="py-3">
                               <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 rounded-full bg-blue-500/20" />
-                                <span className="font-medium text-white">{asset.name}</span>
+                                <span className="font-medium text-white">
+                                  {asset.name}
+                                </span>
                               </div>
                             </td>
-                            <td className="py-3 text-white">${asset.borrowed}</td>
+                            <td className="py-3 text-white">
+                              ${asset.borrowed}
+                            </td>
                             <td className="py-3 text-white">{asset.apy}%</td>
                             <td className="py-3">
                               <Select defaultValue="variable">
@@ -113,14 +151,19 @@ export default function BorrowPage() {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="variable">Variable</SelectItem>
+                                  <SelectItem value="variable">
+                                    Variable
+                                  </SelectItem>
                                   <SelectItem value="fixed">Fixed</SelectItem>
                                 </SelectContent>
                               </Select>
                             </td>
                             <td className="py-3">
                               <div className="flex justify-end gap-2">
-                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                                <Button
+                                  size="sm"
+                                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                                >
                                   Switch
                                 </Button>
                                 <Button
@@ -142,9 +185,8 @@ export default function BorrowPage() {
           )}
         </Card>
 
-        <AssetsToBorrow assets={mockAssets} />
+        <AssetsToBorrow />
       </div>
     </div>
-  )
+  );
 }
-
