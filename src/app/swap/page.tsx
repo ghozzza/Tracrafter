@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { ArrowDownUp } from "lucide-react";
 import { parseUnits } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract, useAccount } from "wagmi";
@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  lendingPool,
   mockEna,
   mockUsdc,
   mockUsde,
@@ -40,7 +41,8 @@ import { priceAbi } from "@/lib/abi/price-abi";
 import { useReadContract } from "wagmi";
 import Image from "next/image";
 import { toast } from "sonner";
-import { swapRouterAbi } from "@/lib/abi/swap-router-abi";
+import { poolAbi } from "@/lib/abi/poolAbi";
+import CreatePosition from "./createPosition";
 
 const tokens = [
   {
@@ -88,6 +90,7 @@ export default function TokenSwap() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [isManualInput, setIsManualInput] = useState<'from' | 'to' | null>(null);
 
+
   const { data: decimal } = useReadContract({
     abi: priceAbi,
     address: priceFeed,
@@ -101,12 +104,12 @@ export default function TokenSwap() {
   const { data: price } = useReadContract({
     abi: priceAbi,
     address: priceFeed,
-    functionName: "getPrice",
+    functionName: "getPriceTrade",
     args: fromToken && toToken ? [fromToken.tokenAddress, toToken.tokenAddress] : undefined,
     query: {
       enabled: Boolean(fromToken && toToken),
     },
-  });
+  }) as unknown as { data: readonly [bigint, bigint] };
 
   const {
     data: swapHash,
@@ -136,7 +139,7 @@ export default function TokenSwap() {
   useEffect(() => {
     if (fromToken && toToken && fromAmount && price && decimal && isManualInput === 'from') {
       setIsCalculating(true);
-      const calculatedAmount = (Number(fromAmount) * Number(price)) / (10 ** 8);
+      const calculatedAmount = (Number(fromAmount) * Number(price[0])) / Number(price[1]);
       setToAmount(calculatedAmount.toFixed(6));
       setIsCalculating(false);
     }
@@ -145,7 +148,7 @@ export default function TokenSwap() {
   useEffect(() => {
     if (fromToken && toToken && toAmount && price && decimal && isManualInput === 'to') {
       setIsCalculating(true);
-      const calculatedAmount = (Number(toAmount) * (10 ** 8)) / Number(price);
+      const calculatedAmount = (Number(toAmount) * Number(price[1])) / Number(price[0]);
       setFromAmount(calculatedAmount.toFixed(6));
       setIsCalculating(false);
     }
@@ -177,15 +180,13 @@ export default function TokenSwap() {
       const amountIn = parseUnits(fromAmount, fromToken.decimals);
 
       await writeSwap({
-        address: swapRouter,
-        abi: swapRouterAbi,
-        functionName: "swapExactTokensForTokens",
+        address: lendingPool,
+        abi: poolAbi,
+        functionName: "swapTokenByPosition",
         args: [
+          toToken.tokenAddress,
+          fromToken.tokenAddress,
           amountIn,
-          0,
-          [fromToken.tokenAddress, toToken.tokenAddress],
-          address,
-          Math.floor(Date.now() / 1000) + 60 * 20,
         ],
       });
 
@@ -335,6 +336,7 @@ export default function TokenSwap() {
               </div>
             ) : "Swap"}
           </Button>
+
         </CardFooter>
       </Card>
     </div>
