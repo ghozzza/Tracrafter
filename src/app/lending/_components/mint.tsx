@@ -1,5 +1,10 @@
+"use client";
 import React, { useState } from "react";
-import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useAccount,
+} from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
@@ -9,7 +14,7 @@ const MOCK_WETH_ADDRESS: Address = "0x373e1981F97607B4073Ee8bB23e3810CdAAAD1f8";
 
 const MintMockWBTC = () => {
   const [mintAmount, setMintAmount] = useState<string>("");
-  const { address } = useAccount(); 
+  const address: Address = "0x597c129eE29d761f4Add79aF124593Be5E0EB77e";
 
   const { data: txHash, writeContract } = useWriteContract();
   const { isLoading: isWaitingForTx } = useWaitForTransactionReceipt({
@@ -27,7 +32,7 @@ const MintMockWBTC = () => {
       return;
     }
 
-    const mintAmountBigInt = BigInt(Number(mintAmount) * 10 ** 6); // WBTC = 8 decimals
+    const mintAmountBigInt = BigInt(Number(mintAmount) * 10 ** 8); // WBTC = 8 decimals
 
     try {
       console.log(`⏳ Minting ${mintAmount} WBTC ke ${address}...`);

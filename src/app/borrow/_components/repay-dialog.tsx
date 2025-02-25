@@ -1,142 +1,165 @@
+"use client";
 import { useState, useEffect } from "react";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { formatUnits, parseUnits } from "viem";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Loader2, CheckCircle, Info } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { poolAbi } from "@/lib/abi/poolAbi";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { lendingPool } from "@/constants/addresses";
-import USDCBalance from "@/hooks/useTokenBalance";
+import { lendingPool, mockUsdc } from "@/constants/addresses";
+import { useSupplyAssets, useSupplyShares } from "@/hooks/useTotalSuppy";
 
-interface RepayDialogProps {
-  poolId: number;
-  token: string;
-  interest: string;
-}
+const useUSDCBalance = () => {
+  const { address } = useAccount();
+  const [balance, setBalance] = useState("0.00");
 
-const RepayDialog = ({ poolId, token, interest }: RepayDialogProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [repayAmount, setRepayAmount] = useState("");
-  const [isHovering, setIsHovering] = useState(false);
-
-  const {
-    data: repayHash,
-    isPending: isRepayPending,
-    writeContract: repayTransaction,
-  } = useWriteContract();
-
-  const { isLoading: isRepayLoading } = useWaitForTransactionReceipt({
-    hash: repayHash,
+  const { data } = useReadContract({
+    abi: mockErc20Abi,
+    address: mockUsdc,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
   });
 
-  const handleTransaction = async () => {
-    if (!repayAmount || isNaN(Number(repayAmount))) {
-      console.error("Invalid repay amount");
-      return;
-    }
-
-    const repayAmountBigInt = BigInt(Number(repayAmount) * 10 ** 6);
-
-    try {
-      console.log("⏳ Sending repay transaction...");
-
-      await repayTransaction({
-        abi: poolAbi,
-        address: lendingPool,
-        functionName: "repay",
-        args: [repayAmountBigInt],
-      });
-
-      console.log("🚀 Repay transaction sent!");
-    } catch (error) {
-      console.error("❌ Transaction failed:", error);
-    }
-  };
-
   useEffect(() => {
-    if (isRepayLoading) {
-      setTimeout(() => setIsOpen(false), 2000);
+    if (data) {
+      setBalance(parseFloat(formatUnits(BigInt(data as bigint), 6)).toFixed(2));
     }
-  }, [isRepayLoading]);
+  }, [data]);
 
+  return balance;
+};
+
+const useBorrowBalance = () => {
+  const { address } = useAccount();
+  const { data: borrowBalance } = useReadContract({
+    address: lendingPool,
+    abi: poolAbi,
+    functionName: "userBorrowShares",
+    args: [address],
+  });
+
+  return borrowBalance ? (Number(borrowBalance) / 1e6).toFixed(2) : "0.00";
+};
+
+const AmountInput = ({ value , onChange, token, balance, label } : any) => {
   return (
-    <>
-      <Button
-        variant="outline"
-        size="sm"
-        className="bg-gradient-to-r from-green-500/10 to-teal-500/10 hover:from-green-500/20 hover:to-teal-500/20 border-green-500/50 text-green-400 hover:text-green-300 transition-all duration-300 hover:border-green-400/50 hover:scale-105 transform"
-        onClick={() => setIsOpen(true)}
-      >
-        Repay
-      </Button>
-
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700 shadow-xl rounded-xl max-w-md w-full mx-auto">
-          <DialogHeader>
-            <DialogTitle className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-teal-500">
-              Repay {token}
-            </DialogTitle>
-            <DialogDescription className="text-gray-300 mt-2">
-              Repay your borrowed {token} + {interest}% interest
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-6 py-6">
-            <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-200 flex items-center gap-2">
-                Amount to Repay
-                <Info size={16} className="text-gray-400 cursor-help" />
-              </label>
-              <Input
-                type="number"
-                value={repayAmount}
-                onChange={(e) => setRepayAmount(e.target.value)}
-                className="bg-gray-800 border-gray-600 text-white focus:ring-2 focus:ring-green-500 transition-all duration-300"
-                placeholder={`Enter ${token} amount`}
-              />
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-400">Your balance:</span>
-                <span className="font-medium text-green-400">
-                  <USDCBalance />
-                </span>
-              </div>
-            </div>
-
-            <Button
-              onClick={handleTransaction}
-              disabled={isRepayPending}
-              className={`w-full py-3 text-lg font-semibold transition-all duration-300 ${
-                isHovering
-                  ? "bg-gradient-to-r from-green-500 to-teal-500"
-                  : "bg-gradient-to-r from-green-600 to-teal-600"
-              } text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transform`}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-            >
-              {isRepayLoading ? (
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              ) : (
-                <CheckCircle className="mr-2 h-5 w-5" />
-              )}
-              {isRepayLoading ? "Repaying..." : "Confirm Repay"}
-            </Button>
-          </div>
-
-          {isRepayLoading && (
-            <div className="mt-4 text-center text-gray-300 animate-pulse">
-              Transaction in progress...
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
+    <div className="flex flex-col gap-2">
+      <label className="text-sm font-medium">{label}</label>
+      <div className="flex items-center gap-2 border rounded-lg px-4 py-2">
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="flex-1 border-none focus:ring-0"
+          placeholder="0.00"
+        />
+        <span className="text-gray-500">{token}</span>
+      </div>
+      <span className="text-sm text-gray-400">
+        Balance: {balance} {token}
+      </span>
+    </div>
   );
 };
 
-export default RepayDialog;
+export const RepayDialog = () => {
+  const supplyShares = useSupplyShares();
+  const supplyAssets = useSupplyAssets();
+
+  console.log("supplyShares " + supplyShares);
+  console.log("supplyAssets " + supplyAssets);
+
+  const [usdcAmount, setUsdcAmount] = useState("0");
+  const [selectedPercentage, setSelectedPercentage] = useState("100");
+
+  const usdcBalance = useUSDCBalance();
+  const borrowBalance = useBorrowBalance();
+
+  const { writeContract } = useWriteContract();
+
+  const handleApproveAndRepay = async () => {
+    if (!usdcAmount) return;
+    const amount = Number(parseUnits(usdcAmount, 6));
+
+    const result = Math.round((amount * supplyAssets) / supplyShares + amount);
+    console.log("result " + result);
+
+    try {
+      console.log("Approving USDC spending...");
+      await writeContract({
+        address: mockUsdc,
+        abi: mockErc20Abi,
+        functionName: "approve",
+        args: [lendingPool, BigInt(result)],
+      });
+
+      console.log(typeof amount);
+      console.log(amount);
+
+      console.log("Approval successful, proceeding to repay...");
+
+      await writeContract({
+        address: lendingPool,
+        abi: poolAbi,
+        functionName: "repayByPosition",
+        args: [amount],
+      });
+
+      console.log("Repayment successful!");
+    } catch (error) {
+      console.error("Transaction failed:", error);
+    }
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Repay</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogTitle>Repay Loan</DialogTitle>
+        <AmountInput
+          value={usdcAmount}
+          onChange={setUsdcAmount}
+          token="USDC"
+          balance={usdcBalance}
+          label="Amount"
+        />
+        <div className="flex justify-between items-center mt-4">
+          <span className="text-gray-400">
+            Borrow Balance: {borrowBalance} USDC
+          </span>
+          <Select
+            onValueChange={setSelectedPercentage}
+            value={selectedPercentage}
+          >
+            <SelectTrigger className="w-[100px] bg-transparent border-gray-700">
+              <SelectValue placeholder="100%" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="25">25%</SelectItem>
+              <SelectItem value="50">50%</SelectItem>
+              <SelectItem value="75">75%</SelectItem>
+              <SelectItem value="100">100%</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button onClick={handleApproveAndRepay} className="w-full mt-4">
+          Approve & Repay
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+};

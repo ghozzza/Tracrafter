@@ -4,23 +4,25 @@ import { useAccount, useReadContract } from "wagmi";
 import { erc20Abi } from "viem";
 import { formatUnits } from "viem/utils";
 import { useState, useEffect } from "react";
+import { mockUsdc, mockWeth,mockWbtc } from "@/constants/addresses";
 
-const USDC_CONTRACT = "0x373e1981F97607B4073Ee8bB23e3810CdAAAD1f8";
-
-export default function USDCBalance() {
+export const USDCBalance = () => {
   const { address } = useAccount();
   const [balance, setBalance] = useState("0");
 
-  const { data, isLoading, refetch } = useReadContract({
+  const { data, isLoading } = useReadContract({
     abi: erc20Abi,
-    address: USDC_CONTRACT,
+    address: mockUsdc,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
   });
 
   useEffect(() => {
     if (data) {
-      setBalance(formatUnits(BigInt(data), 6)); // USDC memiliki 6 desimal
+      const formattedBalance = parseFloat(formatUnits(BigInt(data), 6)).toFixed(
+        2
+      );
+      setBalance(formattedBalance);
     }
   }, [data]);
 
@@ -29,7 +31,67 @@ export default function USDCBalance() {
       {isLoading ? (
         <p>Loading...</p>
       ) : (
-        <p className="text-sm text-gray-100">{balance} USDC</p>
+        <p className="text-sm text-gray-100">{balance}</p>
+      )}
+    </div>
+  );
+}
+export const WbtcBalance = () => {
+  const { address } = useAccount();
+  const [balance, setBalance] = useState("0");
+
+  const { data, isLoading } = useReadContract({
+    abi: erc20Abi,
+    address: mockWbtc,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
+  });
+
+  useEffect(() => {
+    if (data) {
+      const formattedBalance = parseFloat(formatUnits(BigInt(data), 6)).toFixed(
+        2
+      );
+      setBalance(formattedBalance);
+    }
+  }, [data]);
+
+  return (
+    <div>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <p className="text-sm text-gray-100">{balance}</p>
+      )}
+    </div>
+  );
+}
+export const WethBalance = () => {
+  const { address } = useAccount();
+  const [balance, setBalance] = useState("0");
+
+  const { data, isLoading } = useReadContract({
+    abi: erc20Abi,
+    address: mockWeth,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
+  });
+
+  useEffect(() => {
+    if (data) {
+      const formattedBalance = parseFloat(formatUnits(BigInt(data), 6)).toFixed(
+        2
+      );
+      setBalance(formattedBalance);
+    }
+  }, [data]);
+
+  return (
+    <div>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <p className="text-sm text-gray-100">{balance}</p>
       )}
     </div>
   );

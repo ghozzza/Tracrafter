@@ -7,6 +7,7 @@ import { lendingPool } from "@/constants/addresses";
 import { poolAbi } from "@/lib/abi/poolAbi";
 import { useEffect, useState } from "react";
 import SupplyDialog from "./supply-dialog-col";
+import { RepayDialog } from "./repay-dialog";
 
 interface AssetItem {
   id: string;
@@ -83,8 +84,9 @@ export default function AssetsToBorrow() {
             <span className="font-medium text-slate-400">USDC</span>
           </div>
           <div className="col-span-4 text-slate-400">-</div>
-          <div className="col-span-4 flex justify-end">
+          <div className="col-span-4 flex gap-2 justify-end">
             <BorrowDialog token="USDC" />
+            <RepayDialog />
           </div>
         </div>
       </CardContent>

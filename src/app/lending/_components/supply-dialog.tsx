@@ -13,7 +13,7 @@ import { poolAbi } from "@/lib/abi/poolAbi";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { lendingPool, mockUsdc } from "@/constants/addresses";
-import USDCBalance from "@/hooks/useTokenBalance";
+import { USDCBalance } from "@/hooks/useTokenBalance";
 
 interface SupplyDialogProps {
   poolId: number;
