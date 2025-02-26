@@ -124,8 +124,8 @@ export default function TokenSwap() {
   });
 
   console.log("1" + userAddress);
-  console.log("2" +  positionAddress);
-  console.log("3" +  tokenBalance);
+  console.log("2" + positionAddress);
+  console.log("3" + tokenBalance);
 
   const { data: decimal } = useReadContract({
     abi: priceAbi,
@@ -247,13 +247,11 @@ export default function TokenSwap() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-64px)] p-4 relative">
+    <div className="flex justify-center items-center min-h-[calc(100vh-64px)] p-4 relative ">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] -left-[30%] w-[60%] h-[60%] bg-purple-500/10 rounded-full filter blur-[120px]" />
-        <div className="absolute -bottom-[20%] -right-[30%] w-[60%] h-[60%] bg-blue-500/10 rounded-full filter blur-[120px]" />
       </div>
 
-      <Card className="w-full max-w-lg mx-auto backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.57)]">
+      <Card className="w-full w-md xl:w-xl max-w-xl mx-auto backdrop-blur-xl bg-gradient-to-br from-black to-[#01031f] border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.57)] animate-gradient">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-b border-white/5">
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
             Swap
