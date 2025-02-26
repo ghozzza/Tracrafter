@@ -117,7 +117,7 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
           Borrow {token}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-slate-100">
         <DialogHeader>
           <DialogTitle>Borrow {token}</DialogTitle>
           {!hasPosition && (

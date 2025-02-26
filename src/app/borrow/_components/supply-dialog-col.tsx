@@ -24,7 +24,7 @@ import { lendingPool, mockWeth } from "@/constants/addresses";
 import { Loader2 } from "lucide-react";
 
 interface SupplyDialogProps {
-  token: string;
+  token: string | undefined;
 }
 
 export default function SupplyDialogCol({ token }: SupplyDialogProps) {
@@ -160,7 +160,7 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
           Supply {token}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-slate-100">
         <DialogHeader>
           <DialogTitle>Supply {token} as Collateral</DialogTitle>
           {!hasPosition && (

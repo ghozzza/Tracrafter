@@ -8,6 +8,8 @@ import { poolAbi } from "@/lib/abi/poolAbi";
 import { useEffect, useState } from "react";
 import SupplyDialog from "./supply-dialog-col";
 import { RepayDialog } from "./repay-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TOKEN_OPTIONS } from "@/constants/tokenOption";
 
 interface AssetItem {
   id: string;
@@ -18,7 +20,17 @@ interface AssetItem {
 
 export default function AssetsToBorrow() {
   const [hasPosition, setHasPosition] = useState(false);
-  const [collateralBalance, setCollateralBalance] = useState<string>("0");
+  const [collateralBalance, setCollateralBalance] = useState<string | number>(
+    "0"
+  );
+  const [borrowBalance, setBorrowBalance] = useState<string | number>("0");
+  const [userAddress, setUserAddress] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window as any).ethereum?.selectedAddress) {
+      setUserAddress((window as any).ethereum.selectedAddress);
+    }
+  }, []);
 
   const { data: positionAddress } = useReadContract({
     address: lendingPool,
@@ -47,15 +59,46 @@ export default function AssetsToBorrow() {
   const { data: balance } = useReadContract({
     address: lendingPool,
     abi: poolAbi,
-    functionName: "getTokenBalancesByPosition",
-    args: hasPosition ? [positionAddress, "WBTC"] : undefined, // Hanya jalankan jika ada posisi
+    functionName: "userCollaterals",
+    args: hasPosition ? [window.ethereum?.selectedAddress] : undefined, // Hanya jalankan jika ada posisi
+  });
+
+  /**
+   * @dev Collateral Token and Borrow Token address to dynamically name
+   */
+  const { data: collateralToken } = useReadContract({
+    address: lendingPool,
+    abi: poolAbi,
+    functionName: "collateralToken",
+  });
+
+  const getSymbol = (tokenAddress: any) => {
+    return tokenAddress
+      ? `$${TOKEN_OPTIONS.find((t) => t.address === tokenAddress)?.name}`
+      : undefined;
+  };
+  useEffect(() => {
+    if (balance) {
+      setCollateralBalance(Number(balance) / 10 ** 18);
+    }
+  }, [balance]);
+  /**************************************************************** */
+
+  /**
+   * @dev Collateral Token and Borrow Token address to dynamically name
+   */
+  const { data: userBorrowShares } = useReadContract({
+    address: lendingPool,
+    abi: poolAbi,
+    functionName: "userBorrowShares",
+    args: userAddress ? [userAddress] : undefined,
   });
 
   useEffect(() => {
-    if (balance) {
-      setCollateralBalance(balance.toString());
+    if (userBorrowShares) {
+      setBorrowBalance((Number(userBorrowShares) / 10 ** 6).toFixed(2));
     }
-  }, [balance]);
+  }, [userBorrowShares]);
 
   return (
     <Card className="bg-slate-900/50 border-none shadow-xl p-4">
@@ -65,15 +108,25 @@ export default function AssetsToBorrow() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="text-slate-300 text-lg font-semibold">Supply</div>
+        <div className="text-slate-300 text-lg font-semibold">Collateral</div>
         <div className="grid grid-cols-12 gap-4 bg-[#31323d] p-4 rounded-lg">
           <div className="col-span-4 flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-white/10" />
-            <span className="font-medium text-slate-400">WETH</span>
+            <span className="font-medium text-slate-400">
+              {getSymbol(collateralToken) ?? (
+                <Skeleton className="h-6 w-[100px] bg-slate-400" />
+              )}
+            </span>
           </div>
-          <div className="col-span-4 text-slate-400">{collateralBalance}</div>
+          <div className="col-span-4 text-slate-400 mt-1">
+            {collateralBalance != 0 ? collateralBalance : 0}
+          </div>
           <div className="col-span-4 flex justify-end">
-            <SupplyDialog token="WBTC" />
+            {getSymbol(collateralToken) ? (
+              <SupplyDialog token={getSymbol(collateralToken)} />
+            ) : (
+              <Skeleton className="h-8 w-[150px] bg-slate-400" />
+            )}
           </div>
         </div>
 
@@ -81,9 +134,9 @@ export default function AssetsToBorrow() {
         <div className="grid grid-cols-12 gap-4 bg-[#31323d] p-4 rounded-lg">
           <div className="col-span-4 flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-white/10" />
-            <span className="font-medium text-slate-400">USDC</span>
+            <span className="font-medium text-slate-400">$USDC</span>
           </div>
-          <div className="col-span-4 text-slate-400">-</div>
+          <div className="col-span-4 text-slate-400 mt-1">{borrowBalance}</div>
           <div className="col-span-4 flex gap-2 justify-end">
             <BorrowDialog token="USDC" />
             <RepayDialog />

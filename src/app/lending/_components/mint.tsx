@@ -9,12 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { Address } from "viem";
+import { ghoza, mockWeth } from "@/constants/addresses";
 
-const MOCK_WETH_ADDRESS: Address = "0x3A6c69259bC97E0912C7a678ca5331A93d2bfA46";
+const MOCK_WETH_ADDRESS: Address = mockWeth;
 
 const MintMockWBTC = () => {
   const [mintAmount, setMintAmount] = useState<string>("");
-  const address: Address = "0x35c884a8EeFA2D865A64062CcF5c3303a79b9bc5";
+  const address: Address = ghoza;
 
   const { data: txHash, writeContract } = useWriteContract();
   const { isLoading: isWaitingForTx } = useWaitForTransactionReceipt({
