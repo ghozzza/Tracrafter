@@ -21,6 +21,7 @@ import { poolAbi } from "@/lib/abi/poolAbi";
 import { lendingPool, mockUsdc } from "@/constants/addresses";
 import { Loader2 } from "lucide-react";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
+import { useSupplyAssets, useSupplyShares } from "@/hooks/useTotalSuppy";
 
 interface BorrowDialogProps {
   token: string;
@@ -29,7 +30,8 @@ interface BorrowDialogProps {
 export default function BorrowDialog({ token }: BorrowDialogProps) {
   const [amount, setAmount] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [hasPosition, setHasPosition] = useState(false);
+  const [hasPosition, setHasPosition] = useState<boolean | unknown>(false);
+
 
   const { data: positionAddress, refetch: refetchPosition } = useReadContract({
     address: lendingPool,

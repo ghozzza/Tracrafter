@@ -10,6 +10,7 @@ import SupplyDialog from "./supply-dialog-col";
 import { RepayDialog } from "./repay-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TOKEN_OPTIONS } from "@/constants/tokenOption";
+import { useSupplyAssets, useSupplyShares } from "@/hooks/useTotalSuppy";
 
 interface AssetItem {
   id: string;
@@ -27,7 +28,10 @@ export default function AssetsToBorrow() {
   const [userAddress, setUserAddress] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && (window as any).ethereum?.selectedAddress) {
+    if (
+      typeof window !== "undefined" &&
+      (window as any).ethereum?.selectedAddress
+    ) {
       setUserAddress((window as any).ethereum.selectedAddress);
     }
   }, []);
@@ -87,9 +91,18 @@ export default function AssetsToBorrow() {
 
   useEffect(() => {
     if (userBorrowShares) {
-      setBorrowBalance((Number(userBorrowShares) / 10 ** 6).toFixed(2));
+      setBorrowBalance((Number(userBorrowShares)));
     }
   }, [userBorrowShares]);
+
+  const totalSupplyAssets = useSupplyAssets();
+  const totalSupplyShares = useSupplyShares();
+
+  const convertBorrowShares = (amount: Number | unknown, decimal: number) => {
+    const realAmount = Number(amount) / decimal;
+    const result = (realAmount * totalSupplyAssets) / totalSupplyShares;
+    return result.toFixed(2);
+  };
 
   return (
     <Card className="bg-slate-900/50 border-none shadow-xl p-4">
@@ -127,9 +140,11 @@ export default function AssetsToBorrow() {
             <div className="w-8 h-8 rounded-full bg-white/10" />
             <span className="font-medium text-slate-400">$USDC</span>
           </div>
-          <div className="col-span-4 text-slate-400 mt-1">{borrowBalance}</div>
+          <div className="col-span-4 text-slate-400 mt-1">
+            {convertBorrowShares(borrowBalance, 1e6)}
+          </div>
           <div className="col-span-4 flex gap-2 justify-end">
-            <BorrowDialog token="USDC" />
+            <BorrowDialog token="USDC"  />
             <RepayDialog />
           </div>
         </div>

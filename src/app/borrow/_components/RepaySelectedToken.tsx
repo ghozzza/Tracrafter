@@ -19,8 +19,9 @@ import {
 } from "@/components/ui/select";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { poolAbi } from "@/lib/abi/poolAbi";
-import { lendingPool, mockUsdc } from "@/constants/addresses";
+import { lendingPool, mockUsdc, priceFeed } from "@/constants/addresses";
 import { useSupplyAssets, useSupplyShares } from "@/hooks/useTotalSuppy";
+import { priceAbi } from "@/lib/abi/price-abi";
 
 const useUSDCBalance = () => {
   const { address } = useAccount();
@@ -54,31 +55,43 @@ const useBorrowBalance = () => {
   return borrowBalance ? (Number(borrowBalance) / 1e6).toFixed(2) : "0.00";
 };
 
-const AmountInput = ({ value , onChange, token, balance, label } : any) => {
+const AmountInput = ({
+  value,
+  onChange,
+  token,
+  balance,
+  label,
+  price,
+}: any) => {
   return (
     <div className="flex flex-col gap-2">
       <label className="text-sm font-medium">{label}</label>
-      <div className="flex items-center gap-2 border rounded-lg px-4 py-2">
+      <div className="flex items-center gap-2 rounded-lg py-2">
         <Input
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="flex-1 border-none focus:ring-0"
           placeholder="0.00"
         />
-        <span className="text-gray-500">{token}</span>
+        <span className="text-gray-500">${token}/Shares Debt</span>
       </div>
-      <span className="text-sm text-gray-400">
-        Balance: {balance} {token}
-      </span>
+      <div className="flex justify-between">
+        <span className="text-sm text-gray-400">
+          Position Balance: {balance} ${token}
+        </span>
+        <span className="text-sm text-gray-400">
+          Amount: {(value * price).toFixed(3)} USDC
+        </span>
+      </div>
     </div>
   );
 };
 
-export const RepayDialog = () => {
+export const RepaySelectedToken = (props: any) => {
   const supplyShares = useSupplyShares();
   const supplyAssets = useSupplyAssets();
 
-  const [usdcAmount, setUsdcAmount] = useState("0");
+  const [valueAmount, setValueAmount] = useState("0");
   const [selectedPercentage, setSelectedPercentage] = useState("100");
 
   const usdcBalance = useUSDCBalance();
@@ -86,12 +99,27 @@ export const RepayDialog = () => {
 
   const { writeContract } = useWriteContract();
 
-  const handleApproveAndRepay = async () => {
-    if (!usdcAmount) return;
-    const amount = Number(parseUnits(usdcAmount, 6));
+  const debtEquals = () => {
+    return Number(
+      (Number(borrowBalance) * Number(totalBorrowAssets)) /
+        Number(totalBorrowShares)
+    );
+  };
 
-    const result = Math.round((amount * supplyAssets) / supplyShares + amount);
-    console.log("result " + result);
+  const { data: realPrice } = useReadContract({
+    address: priceFeed,
+    abi: priceAbi,
+    functionName: "getPrice",
+    args: [props.address, mockUsdc],
+  });
+  /*********** Function */
+  const handleApproveAndRepay = async () => {
+    if (!valueAmount) return;
+
+    const amount = Number(Number(realPrice) * Number(valueAmount));
+    console.log(amount);
+    // 407917658
+    const result = Math.round(amount + amount);
 
     try {
       console.log("Approving USDC spending...");
@@ -101,17 +129,13 @@ export const RepayDialog = () => {
         functionName: "approve",
         args: [lendingPool, BigInt(result)],
       });
-
-      console.log(typeof amount);
-      console.log(amount);
-
       console.log("Approval successful, proceeding to repay...");
 
       await writeContract({
         address: lendingPool,
         abi: poolAbi,
-        functionName: "repayByPosition",
-        args: [amount],
+        functionName: "repayWithSelectedToken",
+        args: [BigInt(amount), props.address],
       });
 
       console.log("Repayment successful!");
@@ -119,6 +143,20 @@ export const RepayDialog = () => {
       console.error("Transaction failed:", error);
     }
   };
+
+  const { data: totalBorrowAssets } = useReadContract({
+    address: lendingPool,
+    abi: poolAbi,
+    functionName: "totalBorrowAssets",
+    args: [],
+  });
+
+  const { data: totalBorrowShares } = useReadContract({
+    address: lendingPool,
+    abi: poolAbi,
+    functionName: "totalBorrowShares",
+    args: [],
+  });
 
   return (
     <Dialog>
@@ -128,15 +166,18 @@ export const RepayDialog = () => {
       <DialogContent>
         <DialogTitle>Repay Loan</DialogTitle>
         <AmountInput
-          value={usdcAmount}
-          onChange={setUsdcAmount}
-          token="USDC"
-          balance={usdcBalance}
+          value={valueAmount}
+          onChange={setValueAmount}
+          token={props.name}
+          balance={props.balance}
           label="Amount"
+          price={realPrice ? Number(realPrice) / 1e6 : 1}
         />
         <div className="flex justify-between items-center mt-4">
           <span className="text-gray-400">
-            Borrow Balance: {borrowBalance} USDC
+            Debt: {borrowBalance} Shares
+            <br />
+            Equals to {debtEquals().toFixed(3)} USDC
           </span>
           <Select
             onValueChange={setSelectedPercentage}
