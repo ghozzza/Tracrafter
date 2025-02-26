@@ -43,7 +43,6 @@ export default function AssetsToBorrow() {
     ],
   });
 
-  // Gunakan hook useEffect untuk mendeteksi perubahan posisi
   useEffect(() => {
     if (
       positionAddress &&
@@ -55,17 +54,13 @@ export default function AssetsToBorrow() {
     }
   }, [positionAddress]);
 
-  // Pisahkan useReadContract untuk membaca saldo collateral
   const { data: balance } = useReadContract({
     address: lendingPool,
     abi: poolAbi,
     functionName: "userCollaterals",
-    args: hasPosition ? [window.ethereum?.selectedAddress] : undefined, // Hanya jalankan jika ada posisi
+    args: hasPosition ? [window.ethereum?.selectedAddress] : undefined,
   });
 
-  /**
-   * @dev Collateral Token and Borrow Token address to dynamically name
-   */
   const { data: collateralToken } = useReadContract({
     address: lendingPool,
     abi: poolAbi,
@@ -82,11 +77,7 @@ export default function AssetsToBorrow() {
       setCollateralBalance(Number(balance) / 10 ** 18);
     }
   }, [balance]);
-  /**************************************************************** */
 
-  /**
-   * @dev Collateral Token and Borrow Token address to dynamically name
-   */
   const { data: userBorrowShares } = useReadContract({
     address: lendingPool,
     abi: poolAbi,

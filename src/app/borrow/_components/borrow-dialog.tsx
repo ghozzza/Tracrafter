@@ -18,8 +18,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { poolAbi } from "@/lib/abi/poolAbi";
-import { lendingPool } from "@/constants/addresses";
+import { lendingPool, mockUsdc } from "@/constants/addresses";
 import { Loader2 } from "lucide-react";
+import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 
 interface BorrowDialogProps {
   token: string;
@@ -42,25 +43,42 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
   });
 
   useEffect(() => {
-    if (
+    setHasPosition(
       positionAddress &&
-      positionAddress !== "0x0000000000000000000000000000000000000000"
-    ) {
-      setHasPosition(true);
-    } else {
-      setHasPosition(false);
-    }
+        positionAddress !== "0x0000000000000000000000000000000000000000"
+    );
   }, [positionAddress]);
 
   const {
-    data: writeHash,
-    writeContract,
-    isPending: isWritePending,
+    data: approveHash,
+    isPending: isApprovePending,
+    writeContract: approveTransaction,
   } = useWriteContract();
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash: writeHash,
+  const {
+    data: borrowHash,
+    isPending: isBorrowPending,
+    writeContract: borrowTransaction,
+  } = useWriteContract();
+
+  const {
+    data: positionHash,
+    isPending: isPositionPending,
+    writeContract: createPositionTransaction,
+  } = useWriteContract();
+
+  const { isLoading: isPositionLoading } = useWaitForTransactionReceipt({
+    hash: positionHash,
   });
+
+  const { isLoading: isApproveLoading } = useWaitForTransactionReceipt({
+    hash: approveHash,
+  });
+
+  const { isLoading: isBorrowLoading, isSuccess } =
+    useWaitForTransactionReceipt({
+      hash: borrowHash,
+    });
 
   const handleBorrow = async () => {
     try {
@@ -69,13 +87,12 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
         return;
       }
 
-      const decimals = 6;
-      const parsedAmount = parseUnits(amount, decimals);
+      const parsedAmount = parseUnits(amount, 6);
 
       if (!hasPosition) {
         console.log("🚀 Creating Position...");
 
-        await writeContract({
+        await createPositionTransaction({
           address: lendingPool,
           abi: poolAbi,
           functionName: "createPosition",
@@ -86,16 +103,25 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
         await refetchPosition();
       }
 
-      console.log("💰 Borrowing...");
+      console.log("💰 Approving USDC for borrowing...");
 
-      await writeContract({
+      await approveTransaction({
+        address: mockUsdc,
+        abi: mockErc20Abi,
+        functionName: "approve",
+        args: [lendingPool, parsedAmount],
+      });
+
+      console.log("✅ Borrowing USDC...");
+
+      await borrowTransaction({
         address: lendingPool,
         abi: poolAbi,
         functionName: "borrowByPosition",
         args: [parsedAmount],
       });
 
-      console.log(`Successfully borrowed ${amount} ${token}!`);
+      console.log(`✅ Successfully borrowed ${amount} ${token}!`);
       setAmount("");
     } catch (error) {
       console.error("Borrow error:", error);
@@ -108,7 +134,13 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
     }
   }, [isSuccess]);
 
-  const isProcessing = isWritePending || isConfirming;
+  const isProcessing =
+    isApprovePending ||
+    isBorrowPending ||
+    isPositionPending ||
+    isApproveLoading ||
+    isBorrowLoading ||
+    isPositionLoading;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

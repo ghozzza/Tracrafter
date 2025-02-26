@@ -9,13 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { Address } from "viem";
-import { ghoza, mockWeth } from "@/constants/addresses";
+import { ahmad, mockUsdc, hxAddress } from "@/constants/addresses";
 
-const MOCK_WETH_ADDRESS: Address = mockWeth;
+const MOCK_WETH_ADDRESS: Address = mockUsdc;
 
 const MintMockWBTC = () => {
   const [mintAmount, setMintAmount] = useState<string>("");
-  const address: Address = ghoza;
+  const address: Address = ahmad;
 
   const { data: txHash, writeContract } = useWriteContract();
   const { isLoading: isWaitingForTx } = useWaitForTransactionReceipt({
@@ -33,7 +33,7 @@ const MintMockWBTC = () => {
       return;
     }
 
-    const mintAmountBigInt = BigInt(Number(mintAmount) * 10 ** 18); // WBTC = 8 decimals
+    const mintAmountBigInt = BigInt(Number(mintAmount) * 10 ** 6); // WBTC = 8 decimals
 
     try {
       console.log(`⏳ Minting ${mintAmount} WBTC ke ${address}...`);
@@ -75,7 +75,7 @@ const MintMockWBTC = () => {
         <p className="text-sm text-gray-400">
           ✅ Minting Success!{" "}
           <a
-            href={`https://testnet-explorer.riselabs.xyz/tx/${txHash}`}
+            href={`${hxAddress}${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-400 underline"

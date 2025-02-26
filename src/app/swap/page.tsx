@@ -3,7 +3,11 @@
 import { use, useEffect, useState } from "react";
 import { ArrowDownUp } from "lucide-react";
 import { parseUnits } from "viem";
-import { useWaitForTransactionReceipt, useWriteContract, useAccount } from "wagmi";
+import {
+  useWaitForTransactionReceipt,
+  useWriteContract,
+  useAccount,
+} from "wagmi";
 import usdc from "../../../public/usdc.png";
 import usde from "../../../public/usde.png";
 import weth from "../../../public/weth.png";
@@ -42,6 +46,7 @@ import { useReadContract } from "wagmi";
 import Image from "next/image";
 import { toast } from "sonner";
 import { poolAbi } from "@/lib/abi/poolAbi";
+import { positionAbi } from "@/lib/abi/positionAbi";
 
 const tokens = [
   {
@@ -87,8 +92,40 @@ export default function TokenSwap() {
   const [fromAmount, setFromAmount] = useState("");
   const [toAmount, setToAmount] = useState("");
   const [isCalculating, setIsCalculating] = useState(false);
-  const [isManualInput, setIsManualInput] = useState<'from' | 'to' | null>(null);
+  const [isManualInput, setIsManualInput] = useState<"from" | "to" | null>(
+    null
+  );
 
+  const { address } = useAccount();
+
+  const [userAddress, setUserAddress] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      (window as any).ethereum?.selectedAddress
+    ) {
+      setUserAddress((window as any).ethereum.selectedAddress);
+    }
+  }, []);
+
+  const { data: positionAddress, refetch: refetchPosition } = useReadContract({
+    address: lendingPool,
+    abi: poolAbi,
+    functionName: "addressPosition",
+    args: userAddress ? [userAddress] : undefined,
+  });
+
+  const { data: tokenBalance } = useReadContract({
+    address: positionAddress,
+    abi: positionAbi,
+    functionName: "tokenBalances",
+    args: [mockUsdc],
+  });
+
+  console.log("1" + userAddress);
+  console.log("2" +  positionAddress);
+  console.log("3" +  tokenBalance);
 
   const { data: decimal } = useReadContract({
     abi: priceAbi,
@@ -104,7 +141,10 @@ export default function TokenSwap() {
     abi: priceAbi,
     address: priceFeed,
     functionName: "getPriceTrade",
-    args: fromToken && toToken ? [fromToken.tokenAddress, toToken.tokenAddress] : undefined,
+    args:
+      fromToken && toToken
+        ? [fromToken.tokenAddress, toToken.tokenAddress]
+        : undefined,
     query: {
       enabled: Boolean(fromToken && toToken),
     },
@@ -120,8 +160,6 @@ export default function TokenSwap() {
     hash: swapHash,
   });
 
-  const { address } = useAccount();
-
   const switchTokens = () => {
     setIsManualInput(null);
     const tempFromToken = fromToken;
@@ -136,18 +174,34 @@ export default function TokenSwap() {
   };
 
   useEffect(() => {
-    if (fromToken && toToken && fromAmount && price && decimal && isManualInput === 'from') {
+    if (
+      fromToken &&
+      toToken &&
+      fromAmount &&
+      price &&
+      decimal &&
+      isManualInput === "from"
+    ) {
       setIsCalculating(true);
-      const calculatedAmount = (Number(fromAmount) * Number(price[0])) / Number(price[1]);
+      const calculatedAmount =
+        (Number(fromAmount) * Number(price[0])) / Number(price[1]);
       setToAmount(calculatedAmount.toFixed(6));
       setIsCalculating(false);
     }
   }, [fromToken, toToken, fromAmount, price, decimal, isManualInput]);
 
   useEffect(() => {
-    if (fromToken && toToken && toAmount && price && decimal && isManualInput === 'to') {
+    if (
+      fromToken &&
+      toToken &&
+      toAmount &&
+      price &&
+      decimal &&
+      isManualInput === "to"
+    ) {
       setIsCalculating(true);
-      const calculatedAmount = (Number(toAmount) * Number(price[1])) / Number(price[0]);
+      const calculatedAmount =
+        (Number(toAmount) * Number(price[1])) / Number(price[0]);
       setFromAmount(calculatedAmount.toFixed(6));
       setIsCalculating(false);
     }
@@ -155,16 +209,16 @@ export default function TokenSwap() {
 
   const handleFromAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === '' || (Number(value) >= 0 && !value.startsWith('-'))) {
-      setIsManualInput('from');
+    if (value === "" || (Number(value) >= 0 && !value.startsWith("-"))) {
+      setIsManualInput("from");
       setFromAmount(value);
     }
   };
 
   const handleToAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === '' || (Number(value) >= 0 && !value.startsWith('-'))) {
-      setIsManualInput('to');
+    if (value === "" || (Number(value) >= 0 && !value.startsWith("-"))) {
+      setIsManualInput("to");
       setToAmount(value);
     }
   };
@@ -182,11 +236,7 @@ export default function TokenSwap() {
         address: lendingPool,
         abi: poolAbi,
         functionName: "swapTokenByPosition",
-        args: [
-          toToken.tokenAddress,
-          fromToken.tokenAddress,
-          amountIn,
-        ],
+        args: [toToken.tokenAddress, fromToken.tokenAddress, amountIn],
       });
 
       toast.success("Swap initiated!");
@@ -198,7 +248,6 @@ export default function TokenSwap() {
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-64px)] p-4 relative">
-      {/* Background gradients */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -left-[30%] w-[60%] h-[60%] bg-purple-500/10 rounded-full filter blur-[120px]" />
         <div className="absolute -bottom-[20%] -right-[30%] w-[60%] h-[60%] bg-blue-500/10 rounded-full filter blur-[120px]" />
@@ -206,12 +255,18 @@ export default function TokenSwap() {
 
       <Card className="w-full max-w-lg mx-auto backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.57)]">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-b border-white/5">
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">Swap</CardTitle>
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
+            Swap
+            <span className="text-sm text-white">{positionAddress}</span> <br />
+            {/* <span className="text-sm text-white">{Number(tokenBalance)}</span> */}
+          </CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-6 pt-6">
           <div className="space-y-2">
-            <Label htmlFor="from-amount" className="text-gray-300 font-medium">From</Label>
+            <Label htmlFor="from-amount" className="text-gray-300 font-medium">
+              From
+            </Label>
             <div className="flex space-x-2 relative group">
               <Input
                 id="from-amount"
@@ -235,7 +290,11 @@ export default function TokenSwap() {
                 </SelectTrigger>
                 <SelectContent className="backdrop-blur-md bg-gray-900/90 border border-white/10 text-white">
                   {tokens.map((token) => (
-                    <SelectItem key={token.symbol} value={token.symbol} className="focus:bg-[#afafaf] hover:bg-white/10">
+                    <SelectItem
+                      key={token.symbol}
+                      value={token.symbol}
+                      className="focus:bg-[#afafaf] hover:bg-white/10"
+                    >
                       <div className="flex items-center space-x-2">
                         <Image
                           src={token.logo}
@@ -269,7 +328,9 @@ export default function TokenSwap() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="to-amount" className="text-gray-300 font-medium">To</Label>
+            <Label htmlFor="to-amount" className="text-gray-300 font-medium">
+              To
+            </Label>
             <div className="flex space-x-2 relative group">
               <Input
                 id="to-amount"
@@ -293,7 +354,11 @@ export default function TokenSwap() {
                 </SelectTrigger>
                 <SelectContent className="backdrop-blur-md bg-gray-900/90 border border-white/10 text-white">
                   {tokens.map((token) => (
-                    <SelectItem key={token.symbol} value={token.symbol} className="focus:bg-[#afafaf] hover:bg-[#2f77f5]">
+                    <SelectItem
+                      key={token.symbol}
+                      value={token.symbol}
+                      className="focus:bg-[#afafaf] hover:bg-[#2f77f5]"
+                    >
                       <div className="flex items-center space-x-2">
                         <Image
                           src={token.logo}
@@ -314,7 +379,9 @@ export default function TokenSwap() {
 
           {fromToken && toToken && fromAmount && toAmount && (
             <div className="text-xs text-gray-400 px-2 text-right animate-fade-in">
-              1 {fromToken.symbol} ≈ {((Number(toAmount) / Number(fromAmount)) || 0).toFixed(6)} {toToken.symbol}
+              1 {fromToken.symbol} ≈{" "}
+              {(Number(toAmount) / Number(fromAmount) || 0).toFixed(6)}{" "}
+              {toToken.symbol}
             </div>
           )}
         </CardContent>
@@ -323,19 +390,42 @@ export default function TokenSwap() {
           <Button
             className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-medium py-6 rounded-xl shadow-lg hover:shadow-purple-500/20 transition-all duration-300 transform hover:translate-y-[-2px]"
             onClick={handleSwap}
-            disabled={!fromToken || !toToken || !fromAmount || isSwapPending || isSwapLoading}
+            disabled={
+              !fromToken ||
+              !toToken ||
+              !fromAmount ||
+              isSwapPending ||
+              isSwapLoading
+            }
           >
             {isSwapPending || isSwapLoading ? (
               <div className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Swapping...
               </div>
-            ) : "Swap"}
+            ) : (
+              "Swap"
+            )}
           </Button>
-
         </CardFooter>
       </Card>
     </div>

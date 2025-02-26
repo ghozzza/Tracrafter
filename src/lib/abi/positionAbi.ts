@@ -3,7 +3,7 @@ export const positionAbi = [
     inputs: [
       {
         internalType: "address",
-        name: "_collateral1",
+        name: "_collateral",
         type: "address",
       },
       {
@@ -14,6 +14,16 @@ export const positionAbi = [
     ],
     stateMutability: "nonpayable",
     type: "constructor",
+  },
+  {
+    inputs: [],
+    name: "InsufficientBalance",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "TokenNotFound",
+    type: "error",
   },
   {
     anonymous: false,
@@ -68,7 +78,89 @@ export const positionAbi = [
   },
   {
     inputs: [],
-    name: "collateral1",
+    name: "collateralAssets",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_token",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
+    ],
+    name: "costSwapToken",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "counter",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getAllTokenOwnerAddress",
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "",
+        type: "address[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_token",
+        type: "address",
+      },
+    ],
+    name: "getTokenCounter",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_counter",
+        type: "uint256",
+      },
+    ],
+    name: "getTokenOwnerAddress",
     outputs: [
       {
         internalType: "address",
@@ -87,45 +179,7 @@ export const positionAbi = [
         type: "address",
       },
     ],
-    name: "getTokenBalance",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_index",
-        type: "uint256",
-      },
-    ],
-    name: "getTokenOwnerAddress",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_index",
-        type: "uint256",
-      },
-    ],
-    name: "getTokenOwnerAmount",
+    name: "getTokenOwnerBalances",
     outputs: [
       {
         internalType: "uint256",
@@ -195,7 +249,7 @@ export const positionAbi = [
         type: "address",
       },
     ],
-    name: "tokenBalance",
+    name: "tokenBalances",
     outputs: [
       {
         internalType: "uint256",
@@ -214,16 +268,30 @@ export const positionAbi = [
         type: "uint256",
       },
     ],
-    name: "tokenOwner",
+    name: "tokenLists",
     outputs: [
       {
         internalType: "address",
-        name: "token",
+        name: "",
         type: "address",
       },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "tokenListsId",
+    outputs: [
       {
         internalType: "uint256",
-        name: "amount",
+        name: "",
         type: "uint256",
       },
     ],

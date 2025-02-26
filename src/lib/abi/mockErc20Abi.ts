@@ -217,7 +217,7 @@ export const mockErc20Abi = [
         type: "uint8",
       },
     ],
-    stateMutability: "view",
+    stateMutability: "pure",
     type: "function",
   },
   {
