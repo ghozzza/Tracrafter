@@ -13,7 +13,7 @@ import { poolAbi } from "@/lib/abi/poolAbi";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { lendingPool, mockUsdc } from "@/constants/addresses";
-import { USDCBalance } from "@/hooks/useTokenBalance";
+import { useUsdcBalance } from "@/hooks/useTokenBalance";
 
 interface SupplyDialogProps {
   poolId: number;
@@ -25,6 +25,8 @@ const SupplyDialog = ({ poolId, token, apy }: SupplyDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [supplyAmount, setSupplyAmount] = useState("");
   const [isHovering, setIsHovering] = useState(false);
+
+  const usdcBalance = useUsdcBalance();
 
   const {
     data: approveHash,
@@ -126,9 +128,7 @@ const SupplyDialog = ({ poolId, token, apy }: SupplyDialogProps) => {
               />
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-400">Your balance:</span>
-                <span className="font-medium text-blue-400">
-                  <USDCBalance />
-                </span>
+                <span className="font-medium text-blue-400">{usdcBalance}</span>
               </div>
             </div>
 

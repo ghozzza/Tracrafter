@@ -181,23 +181,10 @@ export const RepaySelectedToken = (props: any) => {
             <br />
             Equals to {debtEquals().toFixed(3)} USDC
           </span>
-          <Select
-            onValueChange={setSelectedPercentage}
-            value={selectedPercentage}
-          >
-            <SelectTrigger className="w-[100px] bg-transparent border-gray-700">
-              <SelectValue placeholder="100%" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="25">25%</SelectItem>
-              <SelectItem value="50">50%</SelectItem>
-              <SelectItem value="75">75%</SelectItem>
-              <SelectItem value="100">100%</SelectItem>
-            </SelectContent>
-          </Select>
+
         </div>
         <Button onClick={handleApproveAndRepay} className="w-full mt-4">
-          Approve & Repay
+          Repay
         </Button>
       </DialogContent>
     </Dialog>

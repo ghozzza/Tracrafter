@@ -6,7 +6,6 @@ function PageLending() {
   return (
     <div>
       <LendingPool />
-      <MintMockWBTC />
     </div>
   );
 }

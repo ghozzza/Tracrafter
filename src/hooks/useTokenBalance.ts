@@ -4,9 +4,9 @@ import { useAccount, useReadContract } from "wagmi";
 import { erc20Abi } from "viem";
 import { formatUnits } from "viem/utils";
 import { useState, useEffect } from "react";
-import { mockUsdc, mockWeth,mockWbtc } from "@/constants/addresses";
+import { mockUsdc, mockWeth, mockWbtc } from "@/constants/addresses";
 
-export const USDCBalance = () => {
+export const useUsdcBalance = () => {
   const { address } = useAccount();
   const [balance, setBalance] = useState("0");
 
@@ -26,17 +26,9 @@ export const USDCBalance = () => {
     }
   }, [data]);
 
-  return (
-    <div>
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <p className="text-sm text-gray-100">{balance}</p>
-      )}
-    </div>
-  );
-}
-export const WbtcBalance = () => {
+  return balance;
+};
+export const useWbtcBalance = () => {
   const { address } = useAccount();
   const [balance, setBalance] = useState("0");
 
@@ -56,17 +48,9 @@ export const WbtcBalance = () => {
     }
   }, [data]);
 
-  return (
-    <div>
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <p className="text-sm text-gray-100">{balance}</p>
-      )}
-    </div>
-  );
-}
-export const WethBalance = () => {
+  return balance;
+};
+export const useWethBalance = () => {
   const { address } = useAccount();
   const [balance, setBalance] = useState("0");
 
@@ -79,20 +63,12 @@ export const WethBalance = () => {
 
   useEffect(() => {
     if (data) {
-      const formattedBalance = parseFloat(formatUnits(BigInt(data), 6)).toFixed(
-        2
-      );
+      const formattedBalance = parseFloat(
+        formatUnits(BigInt(data), 18)
+      ).toFixed(4);
       setBalance(formattedBalance);
     }
   }, [data]);
 
-  return (
-    <div>
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <p className="text-sm text-gray-100">{balance}</p>
-      )}
-    </div>
-  );
-}
+  return balance;
+};

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { formatUnits, parseUnits } from "viem";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
+
 const useWethBalance = () => {
   const { address } = useAccount();
   const { data } = useReadContract({
@@ -35,39 +36,64 @@ const useWethBalance = () => {
     : "0.00";
 };
 
-const AmountInput = ({ value, onChange, token, balance, label }: any) => {
+const useCollateralBalance = () => {
+  const { address } = useAccount();
+  const { data } = useReadContract({
+    address: lendingPool,
+    abi: poolAbi,
+    functionName: "userCollaterals",
+    args: address ? [address] : undefined,
+  });
+
+  return data ? Number(formatUnits(BigInt(data as bigint), 18)) : 0;
+};
+
+const AmountInput = ({
+  value,
+  onChange,
+  token,
+  label,
+  collateralBalance,
+}: any) => {
   return (
-    <Card className="border border-slate-700 bg-slate-800 shadow-md">
+    <Card className="border border-slate-200 bg-white shadow-sm">
       <CardContent className="p-4">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-sm font-medium text-slate-300">{label}</h3>
+          <h3 className="text-sm font-medium text-slate-700">{label}</h3>
           <Badge
             variant="outline"
-            className="bg-purple-900/50 text-purple-300 border-purple-700"
+            className="bg-purple-50 text-purple-700 border-purple-200"
           >
             Withdraw
           </Badge>
         </div>
 
-        <div className="flex items-center space-x-2 bg-slate-900 p-2 rounded-lg border border-slate-700">
+        <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
           <Input
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-lg font-medium text-slate-200"
+            className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-lg font-medium"
             placeholder="0.00"
           />
-          <div className="flex items-center gap-1 bg-slate-700 px-3 py-1 rounded-md">
-            <span className="font-semibold text-slate-200">
-              ${token.toUpperCase()}
+          <div className="flex items-center gap-1 bg-slate-200 px-3 py-1 rounded-md">
+            <Wallet className="h-4 w-4 text-slate-700" />
+            <span className="font-semibold text-slate-700">
+              {token.toUpperCase()}
             </span>
           </div>
         </div>
 
-        <div className="mt-3 text-xs text-slate-400 flex items-center justify-between">
-          <span>Available balance</span>
-          <span className="font-medium text-slate-300">
-            ${balance} {token.toUpperCase()}
-          </span>
+        <div className="mt-3 text-xs text-slate-500 flex items-center justify-between">
+          <div>
+            <span>Your Collateral : </span>
+            <span className="font-medium">{collateralBalance} $WETH</span>
+          </div>
+          <button
+            className="text-xs p-1 text-purple-700 border border-purple-700 rounded-md hover:bg-purple-400"
+            onClick={() => onChange(collateralBalance)}
+          >
+            max
+          </button>
         </div>
       </CardContent>
     </Card>
@@ -78,8 +104,9 @@ export const WithdrawDialog = () => {
   const [wethAmount, setWethAmount] = useState("0");
   const [isOpen, setIsOpen] = useState(false);
   const wethBalance = useWethBalance();
+  const collateralBalance = useCollateralBalance();
 
-  const { writeContract, isPending, isSuccess } = useWriteContract();
+  const { writeContract, isPending } = useWriteContract();
 
   const handleWithdraw = async () => {
     if (!wethAmount || Number.parseFloat(wethAmount) <= 0) {
@@ -113,17 +140,17 @@ export const WithdrawDialog = () => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          className="bg-gradient-to-r from-purple-600 to-indigo-500 hover:from-purple-700 hover:to-indigo-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 rounded-lg border-0"
-          size="sm"
+          className="bg-gradient-to-r from-purple-500 to-indigo-400 hover:from-purple-600 hover:to-indigo-500 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 rounded-lg border-0"
+          size="lg"
         >
-          <ArrowUpRight className="mr-1 h-4 w-4" /> Withdraw
+          <ArrowUpRight className="mr-2 h-5 w-5" /> Withdraw
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700 shadow-xl rounded-xl max-w-md w-full mx-auto">
-        <DialogHeader className="pb-2 border-b border-gray-700">
+      <DialogContent className="sm:max-w-md bg-gradient-to-b from-white to-slate-50 border-0 shadow-xl rounded-xl">
+        <DialogHeader className="pb-2 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <ArrowUpRight className="h-6 w-6 text-purple-400" />
-            <DialogTitle className="text-xl font-bold text-slate-200">
+            <ArrowUpRight className="h-6 w-6 text-purple-500" />
+            <DialogTitle className="text-xl font-bold text-slate-800">
               Withdraw Collateral
             </DialogTitle>
           </div>
@@ -134,20 +161,20 @@ export const WithdrawDialog = () => {
             value={wethAmount}
             onChange={setWethAmount}
             token="weth"
-            balance={wethBalance}
             label="Withdraw Amount"
+            collateralBalance={collateralBalance}
           />
 
-          <div className="bg-gray-800/50 p-3 rounded-lg border border-purple-800/50">
+          <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
             <div className="flex items-start">
-              <div className="bg-purple-900/60 p-1 rounded-full mr-2">
-                <Wallet className="h-4 w-4 text-purple-300" />
+              <div className="bg-purple-100 p-1 rounded-full mr-2">
+                <Wallet className="h-4 w-4 text-purple-600" />
               </div>
               <div>
-                <h4 className="text-xs font-medium text-purple-300 mb-1">
+                <h4 className="text-xs font-medium text-purple-700 mb-1">
                   Withdrawal Information
                 </h4>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-purple-600">
                   Withdrawing collateral may affect your borrowing capacity.
                   Ensure you maintain a healthy position to avoid liquidation.
                 </p>
@@ -164,21 +191,16 @@ export const WithdrawDialog = () => {
             }
             className={`w-full h-12 text-base font-medium rounded-lg ${
               isPending
-                ? "bg-slate-700 text-slate-400"
-                : "bg-gradient-to-r from-purple-600 to-indigo-500 hover:from-purple-700 hover:to-indigo-600 text-white shadow-md hover:shadow-lg"
+                ? "bg-slate-200 text-slate-500"
+                : "bg-gradient-to-r from-purple-500 to-indigo-400 hover:from-purple-600 hover:to-indigo-500 text-white shadow-md hover:shadow-lg"
             }`}
           >
             {isPending ? (
-              <div className="flex items-center justify-center">
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                <span>Processing Withdrawal...</span>
-              </div>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
             ) : (
-              <div className="flex items-center justify-center">
-                <ArrowUpRight className="mr-2 h-5 w-5" />
-                <span>Withdraw WETH</span>
-              </div>
+              <ArrowUpRight className="mr-2 h-5 w-5" />
             )}
+            Withdraw WETH
           </Button>
         </DialogFooter>
       </DialogContent>

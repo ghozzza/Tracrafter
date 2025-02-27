@@ -64,6 +64,7 @@ const useBorrowBalance = () => {
 };
 
 const AmountInput = ({ value, onChange, token, balance, label }: any) => {
+  const borrowBalance = useBorrowBalance();
   return (
     <Card className="border border-slate-200 bg-white shadow-sm">
       <CardContent className="p-4">
@@ -91,10 +92,16 @@ const AmountInput = ({ value, onChange, token, balance, label }: any) => {
         </div>
 
         <div className="mt-3 text-xs text-slate-500 flex items-center justify-between">
-          <span>Available balance</span>
-          <span className="font-medium">
-            {balance} {token}
-          </span>
+          <span className="text-sm text-blue-700">Borrow Balance :</span>
+          <div className="flex items-center  text-xs  gap-2">
+            <span>{borrowBalance} $USDC</span>
+            <button
+              className="text-xs p-0.5 text-blue-500 rounded-md border border-blue-500 hover:bg-blue-300"
+              onClick={() => onChange(borrowBalance)}
+            >
+              Max
+            </button>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -106,11 +113,9 @@ export const RepayDialog = () => {
   const supplyAssets = useSupplyAssets();
 
   const [usdcAmount, setUsdcAmount] = useState("0");
-  const [selectedPercentage, setSelectedPercentage] = useState("100");
   const [isOpen, setIsOpen] = useState(false);
 
   const usdcBalance = useUSDCBalance();
-  const borrowBalance = useBorrowBalance();
 
   const { writeContract, isPending } = useWriteContract();
 
@@ -180,26 +185,6 @@ export const RepayDialog = () => {
             label="Repay Amount"
           />
 
-          <div className="flex justify-between items-center bg-blue-50 p-3 rounded-lg border border-blue-100">
-            <span className="text-sm text-blue-700">
-              Borrow Balance: {borrowBalance} USDC
-            </span>
-            <Select
-              onValueChange={setSelectedPercentage}
-              value={selectedPercentage}
-            >
-              <SelectTrigger className="w-[100px] bg-white border-blue-200 text-blue-700">
-                <SelectValue placeholder="100%" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="25">25%</SelectItem>
-                <SelectItem value="50">50%</SelectItem>
-                <SelectItem value="75">75%</SelectItem>
-                <SelectItem value="100">100%</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
             <div className="flex items-start">
               <div className="bg-blue-100 p-1 rounded-full mr-2">
@@ -238,7 +223,7 @@ export const RepayDialog = () => {
             ) : (
               <div className="flex items-center justify-center">
                 <ArrowDown className="mr-2 h-5 w-5" />
-                <span>Approve & Repay</span>
+                <span>Repay</span>
               </div>
             )}
           </Button>

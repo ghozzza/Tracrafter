@@ -11,7 +11,7 @@ import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { Address } from "viem";
 import { ahmad, mockUsdc, hxAddress, mockWeth } from "@/constants/addresses";
 
-const MOCK_WETH_ADDRESS: Address = mockWeth;
+const MOCK_WETH_ADDRESS: Address = mockUsdc;
 
 const MintMockWBTC = () => {
   const [mintAmount, setMintAmount] = useState<string>("");

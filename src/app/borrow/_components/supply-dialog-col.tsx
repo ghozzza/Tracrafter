@@ -22,9 +22,10 @@ import { toast } from "sonner";
 import { poolAbi } from "@/lib/abi/poolAbi";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { lendingPool, mockWeth } from "@/constants/addresses";
-import { ArrowRight, Loader2, Shield } from "lucide-react";
+import { ArrowRight, DollarSign, Loader2, Shield } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useWethBalance } from "@/hooks/useTokenBalance";
 
 interface SupplyDialogProps {
   token: string | undefined;
@@ -34,6 +35,8 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
   const [amount, setAmount] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [hasPosition, setHasPosition] = useState(false);
+
+  const wethBalance = useWethBalance();
 
   const { data: positionAddress, refetch: refetchPosition } = useReadContract({
     address: lendingPool,
@@ -160,44 +163,44 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          className="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 rounded-lg"
-          size="sm"
+          className="bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-600 hover:to-teal-500 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 rounded-lg"
+          size="lg"
         >
-          <Shield className="mr-1 h-4 w-4" /> Supply
+          Supply {token}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700 shadow-xl rounded-xl">
-        <DialogHeader className="pb-2 border-b border-gray-700">
+      <DialogContent className="sm:max-w-md bg-gradient-to-b from-white to-slate-50 border-0 shadow-xl rounded-xl">
+        <DialogHeader className="pb-2 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-emerald-400" />
-            <DialogTitle className="text-xl font-bold text-slate-200">
+            <Shield className="h-6 w-6 text-emerald-500" />
+            <DialogTitle className="text-xl font-bold text-slate-800">
               Supply {token} as Collateral
             </DialogTitle>
           </div>
           {!hasPosition && (
-            <DialogDescription className="mt-2 text-amber-300 bg-amber-900/30 p-2 rounded-lg border border-amber-700/50 flex items-center">
-              <Shield className="h-4 w-4 mr-2 text-amber-400" />
+            <DialogDescription className="mt-2 text-amber-600 bg-amber-50 p-2 rounded-lg border border-amber-100 flex items-center">
+              <Shield className="h-4 w-4 mr-2 text-amber-500" />
               You need to create a position before supplying collateral.
             </DialogDescription>
           )}
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          <Card className="border border-slate-700 bg-slate-800 shadow-md">
+          <Card className="border border-slate-200 bg-white shadow-sm">
             <CardContent className="p-4">
               <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-medium text-slate-300">
+                <h3 className="text-sm font-medium text-slate-700">
                   Supply Amount
                 </h3>
                 <Badge
                   variant="outline"
-                  className="bg-emerald-900/50 text-emerald-300 border-emerald-700"
+                  className="bg-emerald-50 text-emerald-700 border-emerald-200"
                 >
                   Collateral
                 </Badge>
               </div>
 
-              <div className="flex items-center space-x-2 bg-slate-900 p-2 rounded-lg border border-slate-700">
+              <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
                 <Input
                   placeholder={`Enter amount of ${token} to supply`}
                   value={amount}
@@ -206,23 +209,32 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
                   type="number"
                   min="0"
                   step="0.01"
-                  className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-lg font-medium text-slate-200"
+                  className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-lg font-medium"
                 />
-                <div className="flex items-center gap-1 bg-slate-700 px-3 py-1 rounded-md">
-                  <span className="font-semibold text-slate-200">{token}</span>
+                <div className="flex items-center gap-1 bg-slate-200 px-3 py-1 rounded-md">
+                  <span className="font-semibold text-slate-700">{token}</span>
                 </div>
               </div>
 
-              <div className="mt-3 text-xs text-slate-400 flex items-center">
-                <ArrowRight className="h-3 w-3 mr-1 text-emerald-400" />
-                Supplying assets as collateral enables borrowing and earns
-                interest
+              <div className="mt-3 text-xs text-slate-500 flex justify-between items-center">
+                <span className="mr-1">Your Balance:</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-700 mx-2">
+                    {wethBalance} WETH
+                  </span>
+                  <button
+                    onClick={() => setAmount(wethBalance)}
+                    className="text-xs p-0.5 border border-green-500 rounded-md text-green-500 hover:bg-green-200"
+                  >
+                    Max
+                  </button>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <div className="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
-            <h4 className="text-xs font-medium text-slate-300 mb-2">
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <h4 className="text-xs font-medium text-slate-600 mb-2">
               Transaction Steps:
             </h4>
             <div className="space-y-2 text-xs">
@@ -230,8 +242,8 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
                 <div
                   className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${
                     !hasPosition
-                      ? "bg-emerald-900/70 text-emerald-300"
-                      : "bg-emerald-600 text-slate-200"
+                      ? "bg-emerald-100 text-emerald-600"
+                      : "bg-emerald-500 text-white"
                   }`}
                 >
                   {hasPosition ? "✓" : "1"}
@@ -239,24 +251,24 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
                 <span
                   className={
                     hasPosition
-                      ? "text-slate-500 line-through"
-                      : "text-slate-300"
+                      ? "text-slate-400 line-through"
+                      : "text-slate-700"
                   }
                 >
                   Create position
                 </span>
               </div>
               <div className="flex items-center">
-                <div className="w-4 h-4 rounded-full mr-2 flex items-center justify-center bg-emerald-900/70 text-emerald-300">
+                <div className="w-4 h-4 rounded-full mr-2 flex items-center justify-center bg-emerald-100 text-emerald-600">
                   {hasPosition ? "1" : "2"}
                 </div>
-                <span className="text-slate-300">Approve token</span>
+                <span className="text-slate-700">Approve token</span>
               </div>
               <div className="flex items-center">
-                <div className="w-4 h-4 rounded-full mr-2 flex items-center justify-center bg-emerald-900/70 text-emerald-300">
+                <div className="w-4 h-4 rounded-full mr-2 flex items-center justify-center bg-emerald-100 text-emerald-600">
                   {hasPosition ? "2" : "3"}
                 </div>
-                <span className="text-slate-300">Supply collateral</span>
+                <span className="text-slate-700">Supply collateral</span>
               </div>
             </div>
           </div>
@@ -268,8 +280,8 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
             disabled={isProcessing || !amount}
             className={`w-full h-12 text-base font-medium rounded-lg ${
               isProcessing
-                ? "bg-slate-700 text-slate-400"
-                : "bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white shadow-md hover:shadow-lg"
+                ? "bg-slate-200 text-slate-500"
+                : "bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-600 hover:to-teal-500 text-white shadow-md hover:shadow-lg"
             }`}
           >
             {isProcessing ? (

@@ -20,16 +20,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { poolAbi } from "@/lib/abi/poolAbi";
 import { lendingPool, mockUsdc } from "@/constants/addresses";
-import {
-  ArrowDown,
-  CreditCard,
-  DollarSign,
-  Loader2,
-} from "lucide-react";
+import { ArrowDown, CreditCard, DollarSign, Loader2 } from "lucide-react";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { useUsdcBalance } from "@/hooks/useTokenBalance";
 
 interface BorrowDialogProps {
   token: string;
@@ -39,6 +35,7 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
   const [amount, setAmount] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [hasPosition, setHasPosition] = useState<boolean | unknown>(false);
+  const usdcBalance = useUsdcBalance();
 
   const { data: positionAddress, refetch: refetchPosition } = useReadContract({
     address: lendingPool,
@@ -164,7 +161,7 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
           className="bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 rounded-lg"
           size="lg"
         >
-           Borrow ${token}
+          Borrow ${token}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md bg-gradient-to-b from-white to-slate-50 border-0 shadow-xl rounded-xl">
@@ -214,10 +211,17 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
                 </div>
               </div>
 
-              <div className="mt-3 text-xs text-slate-500 flex items-center">
-                <ArrowDown className="h-3 w-3 mr-1" />
-                Borrowing requires sufficient collateral to maintain a healthy
-                position
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-gray-400">Your balance : </span>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className=" text-gray-600">{usdcBalance}</span>
+                  <button
+                    onClick={() => setAmount(usdcBalance)}
+                    className="text-xs p-0.5 border border-blue-500 rounded-md text-blue-500 hover:bg-blue-200"
+                  >
+                    Max
+                  </button>
+                </div>
               </div>
             </CardContent>
           </Card>

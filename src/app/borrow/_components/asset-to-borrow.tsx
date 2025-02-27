@@ -17,19 +17,12 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { WithdrawDialog } from "./withdraw-dialog-col";
 
-interface AssetItem {
-  id: string;
-  name: string;
-  available: number;
-  apy: number;
-}
-
 export default function AssetsToBorrow() {
   const [hasPosition, setHasPosition] = useState(false);
-  const [collateralBalance, setCollateralBalance] = useState<string | number>(
-    "0"
+  const [collateralBalance, setCollateralBalance] = useState<number | null>(
+    null
   );
-  const [borrowBalance, setBorrowBalance] = useState<string | number>("0");
+  const [borrowBalance, setBorrowBalance] = useState<number | null>(null);
   const [userAddress, setUserAddress] = useState<string | null>(null);
 
   useEffect(() => {
@@ -41,16 +34,13 @@ export default function AssetsToBorrow() {
     }
   }, []);
 
-  const { data: positionAddress } = useReadContract({
-    address: lendingPool,
-    abi: poolAbi,
-    functionName: "addressPosition",
-    args: [
-      typeof window !== "undefined"
-        ? (window as any).ethereum?.selectedAddress
-        : undefined,
-    ],
-  });
+  const { data: positionAddress, isLoading: isPositionLoading } =
+    useReadContract({
+      address: lendingPool,
+      abi: poolAbi,
+      functionName: "addressPosition",
+      args: [userAddress],
+    });
 
   useEffect(() => {
     if (
@@ -63,36 +53,39 @@ export default function AssetsToBorrow() {
     }
   }, [positionAddress]);
 
-  const { data: balance } = useReadContract({
+  const { data: balance, isLoading: isBalanceLoading } = useReadContract({
     address: lendingPool,
     abi: poolAbi,
     functionName: "userCollaterals",
-    args: hasPosition ? [window.ethereum?.selectedAddress] : undefined,
+    args: hasPosition ? [userAddress] : undefined,
   });
 
-  const { data: collateralToken } = useReadContract({
-    address: lendingPool,
-    abi: poolAbi,
-    functionName: "collateralToken",
-  });
+  const { data: collateralToken, isLoading: isCollateralTokenLoading } =
+    useReadContract({
+      address: lendingPool,
+      abi: poolAbi,
+      functionName: "collateralToken",
+    });
 
   const getSymbol = (tokenAddress: any) => {
     return tokenAddress
       ? `$${TOKEN_OPTIONS.find((t) => t.address === tokenAddress)?.name}`
       : undefined;
   };
+
   useEffect(() => {
     if (balance) {
       setCollateralBalance(Number(balance) / 10 ** 18);
     }
   }, [balance]);
 
-  const { data: userBorrowShares } = useReadContract({
-    address: lendingPool,
-    abi: poolAbi,
-    functionName: "userBorrowShares",
-    args: userAddress ? [userAddress] : undefined,
-  });
+  const { data: userBorrowShares, isLoading: isBorrowLoading } =
+    useReadContract({
+      address: lendingPool,
+      abi: poolAbi,
+      functionName: "userBorrowShares",
+      args: userAddress ? [userAddress] : undefined,
+    });
 
   useEffect(() => {
     if (userBorrowShares) {
@@ -103,7 +96,8 @@ export default function AssetsToBorrow() {
   const totalSupplyAssets = useSupplyAssets();
   const totalSupplyShares = useSupplyShares();
 
-  const convertBorrowShares = (amount: Number | unknown, decimal: number) => {
+  const convertBorrowShares = (amount: number | unknown, decimal: number) => {
+    if (!amount || !totalSupplyShares) return "0.00";
     const realAmount = Number(amount) / decimal;
     const result = (realAmount * totalSupplyAssets) / totalSupplyShares;
     return result.toFixed(2);
@@ -118,36 +112,42 @@ export default function AssetsToBorrow() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-slate-300 text-lg font-semibold">Collateral</div>
-        <div className="grid grid-cols-12 gap-4 bg-[#31323d] p-4 rounded-lg">
+        <div className="grid grid-cols-12 gap-4 bg-[#151941] p-4 rounded-lg">
           <div className="col-span-4 flex items-center gap-2">
             <Image
               src={weth}
-              alt={`${getSymbol(collateralToken) || "Token"} logo`}
+              alt="Token logo"
               width={24}
               height={24}
               className="rounded-full"
             />
             <span className="font-medium text-slate-400">
-              {getSymbol(collateralToken) ?? (
+              {isCollateralTokenLoading ? (
                 <Skeleton className="h-6 w-20 bg-slate-400" />
+              ) : (
+                getSymbol(collateralToken)
               )}
             </span>
           </div>
           <div className="col-span-5 text-slate-400 flex items-center">
-            {collateralBalance !== 0 ? collateralBalance : 0}
+            {isBalanceLoading ? (
+              <Skeleton className="h-6 w-20 bg-slate-400" />
+            ) : (
+              collateralBalance ?? 0
+            )}
           </div>
           <div className="col-span-3 flex items-center justify-end gap-2">
-            {getSymbol(collateralToken) ? (
-              <SupplyDialog token={getSymbol(collateralToken)} />
-            ) : (
+            {isCollateralTokenLoading ? (
               <Skeleton className="h-8 w-20 bg-slate-400" />
+            ) : (
+              <SupplyDialog token={getSymbol(collateralToken)} />
             )}
             <WithdrawDialog />
           </div>
         </div>
 
         <div className="text-slate-300 text-lg font-semibold mt-6">Borrow</div>
-        <div className="grid grid-cols-12 gap-4 bg-[#31323d] p-4 rounded-lg">
+        <div className="grid grid-cols-12 gap-4 bg-[#151941] p-4 rounded-lg">
           <div className="col-span-4 flex items-center gap-2">
             <Image
               src={usdc}
@@ -159,10 +159,18 @@ export default function AssetsToBorrow() {
             <span className="font-medium text-slate-400">$USDC</span>
           </div>
           <div className="col-span-4 text-slate-400 mt-1">
-            {convertBorrowShares(borrowBalance, 1e6)}
+            {isBorrowLoading ? (
+              <Skeleton className="h-6 w-20 bg-slate-400" />
+            ) : (
+              convertBorrowShares(borrowBalance, 1e6)
+            )}
           </div>
           <div className="col-span-4 flex gap-2 justify-end">
-            <BorrowDialog token="USDC" />
+            {isBorrowLoading ? (
+              <Skeleton className="h-8 w-20 bg-slate-400" />
+            ) : (
+              <BorrowDialog token="USDC" />
+            )}
             <RepayDialog />
           </div>
         </div>

@@ -7,6 +7,7 @@ import SupplyDialog from "./supply-dialog";
 import Image from "next/image";
 import usdc from "../../../../public/usdc.png";
 import { BarChart3, Shield, CreditCard } from "lucide-react";
+import { WithdrawDialog } from "./withdraw-dialog";
 
 export default function LendingPool() {
   return (
@@ -88,12 +89,17 @@ export default function LendingPool() {
                       <p className="text-xs text-gray-400 mt-1">
                         Total Liquidity
                       </p>
-                      <div className="mt-4">
-                        <SupplyDialog
-                          poolId={pool.id}
-                          token={pool.token}
-                          apy={pool.apy}
-                        />
+                      <div className="flex gap-2 items-center justify-start mt-4">
+                        <div className="">
+                          <SupplyDialog
+                            poolId={pool.id}
+                            token={pool.token}
+                            apy={pool.apy}
+                          />
+                        </div>
+                        <div>
+                          <WithdrawDialog />
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
