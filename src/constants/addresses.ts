@@ -1,8 +1,8 @@
 import { Address } from 'viem'
 
-export const swapRouter = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // Uniswap V2 Router address (works on most testnets) 
+export const swapRouter = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
 export const factory = "0x2C659014c834A27731b0Ed53cA43f3Fd64B2aea3" as Address;
-export const lendingPool = "0x92d52CEA7c516c28629B62C041D95fcb552C1caa" as Address;
+export const lendingPool = "0x708FA5150b3bBe11E8343BfF2Bd2c1458b2476AA" as Address;
 export const position = "0x174a6aa5f27F062C63D920693FEB1511D449ba4B" as Address;
 export const priceFeed = "0xb10CC0A3e2DCD9DE663F0BBd4F5CFf1C965805aC" as Address;
 export const mockWeth = "0xF47E3c53CE1259fEF635Ca319bd929Fd22Da1972" as Address;

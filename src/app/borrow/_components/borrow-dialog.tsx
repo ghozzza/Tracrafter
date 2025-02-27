@@ -21,7 +21,6 @@ import { poolAbi } from "@/lib/abi/poolAbi";
 import { lendingPool, mockUsdc } from "@/constants/addresses";
 import { Loader2 } from "lucide-react";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
-import { useSupplyAssets, useSupplyShares } from "@/hooks/useTotalSuppy";
 
 interface BorrowDialogProps {
   token: string;
@@ -89,23 +88,18 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
         return;
       }
 
-      const parsedAmount = parseUnits(amount, 6);
+      const decimal = 6;
+      const parsedAmount = parseUnits(amount, decimal);
 
       if (!hasPosition) {
-        console.log("🚀 Creating Position...");
-
         await createPositionTransaction({
           address: lendingPool,
           abi: poolAbi,
           functionName: "createPosition",
           args: [],
         });
-
-        console.log("Position created successfully!");
         await refetchPosition();
       }
-
-      console.log("💰 Approving USDC for borrowing...");
 
       await approveTransaction({
         address: mockUsdc,
@@ -114,16 +108,12 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
         args: [lendingPool, parsedAmount],
       });
 
-      console.log("✅ Borrowing USDC...");
-
       await borrowTransaction({
         address: lendingPool,
         abi: poolAbi,
         functionName: "borrowByPosition",
         args: [parsedAmount],
       });
-
-      console.log(`✅ Successfully borrowed ${amount} ${token}!`);
       setAmount("");
     } catch (error) {
       console.error("Borrow error:", error);

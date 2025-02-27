@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { Address } from "viem";
-import { ahmad, mockUsdc, hxAddress } from "@/constants/addresses";
+import { ahmad, mockUsdc, hxAddress, mockWeth } from "@/constants/addresses";
 
-const MOCK_WETH_ADDRESS: Address = mockUsdc;
+const MOCK_WETH_ADDRESS: Address = mockWeth;
 
 const MintMockWBTC = () => {
   const [mintAmount, setMintAmount] = useState<string>("");
@@ -33,7 +33,7 @@ const MintMockWBTC = () => {
       return;
     }
 
-    const mintAmountBigInt = BigInt(Number(mintAmount) * 10 ** 6); // WBTC = 8 decimals
+    const mintAmountBigInt = BigInt(Number(mintAmount) * 10 ** 18); // WBTC = 8 decimals
 
     try {
       console.log(`⏳ Minting ${mintAmount} WBTC ke ${address}...`);
