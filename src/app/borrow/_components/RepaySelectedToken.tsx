@@ -73,14 +73,14 @@ const AmountInput = ({
           className="flex-1 border-none focus:ring-0"
           placeholder="0.00"
         />
-        <span className="text-gray-500">${token}/Shares Debt</span>
+        <span className="text-gray-500">Shares Debt</span>
       </div>
       <div className="flex justify-between">
         <span className="text-sm text-gray-400">
           Position Balance: {balance} ${token}
         </span>
         <span className="text-sm text-gray-400">
-          Amount: {(value * price).toFixed(3)} USDC
+          Amount: {(value / price).toFixed(5)} {token}
         </span>
       </div>
     </div>
@@ -115,9 +115,11 @@ export const RepaySelectedToken = (props: any) => {
   /*********** Function */
   const handleApproveAndRepay = async () => {
     if (!valueAmount) return;
-
-    const amount = Number(Number(realPrice) * Number(valueAmount));
+    const amount = Number(valueAmount) * 1e6;
     console.log(amount);
+    console.log(valueAmount)
+    console.log(realPrice);
+    console.log(props.decimal);
     // 407917658
     const result = Math.round(amount + amount);
 
