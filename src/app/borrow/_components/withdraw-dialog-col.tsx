@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { poolAbi } from "@/lib/abi/poolAbi";
 import { lendingPool, mockWeth } from "@/constants/addresses";
-import { useSupplyAssets, useSupplyShares } from "@/hooks/useTotalSuppy";
 
 const useWethBalance = () => {
   const { address } = useAccount();
@@ -50,28 +49,18 @@ const AmountInput = ({ value, onChange, token, balance, label }: any) => {
 };
 
 export const WithdrawDialog = () => {
-
   const [wethAmount, setwethAmount] = useState("0");
   const wethBalance = useWethBalance();
 
   const { writeContract } = useWriteContract();
 
-  const handleApproveAndWithdraw = async () => {
+  const handleWithdraw = async () => {
     if (!wethAmount) return;
     const amount = BigInt(parseUnits(wethAmount, 18));
-
+    console.log(amount);
 
     try {
-      console.log("Approving weth spending...");
-      await writeContract({
-        address: mockWeth,
-        abi: mockErc20Abi,
-        functionName: "approve",
-        args: [lendingPool, BigInt(amount)],
-      });
-
-      console.log("Approval successful, proceeding to withdraw...");
-
+      console.log("Menarik jaminan...");
       await writeContract({
         address: lendingPool,
         abi: poolAbi,
@@ -79,9 +68,9 @@ export const WithdrawDialog = () => {
         args: [amount],
       });
 
-      console.log("Withdrawal successful!");
+      console.log("Penarikan berhasil!");
     } catch (error) {
-      console.error("Transaction failed:", error);
+      console.error("Penarikan gagal:", error);
     }
   };
 
@@ -99,7 +88,7 @@ export const WithdrawDialog = () => {
           balance={wethBalance}
           label="Amount"
         />
-        <Button onClick={handleApproveAndWithdraw} className="w-full mt-4">
+        <Button onClick={handleWithdraw} className="w-full mt-4">
           Withdraw
         </Button>
       </DialogContent>
