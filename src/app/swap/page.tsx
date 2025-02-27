@@ -1,27 +1,20 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import type React from "react";
+
+import { useEffect, useState } from "react";
 import { ArrowDownUp } from "lucide-react";
 import { parseUnits } from "viem";
 import {
   useWaitForTransactionReceipt,
   useWriteContract,
   useAccount,
+  useReadContract,
 } from "wagmi";
-import usdc from "../../../public/usdc.png";
-import usde from "../../../public/usde.png";
-import weth from "../../../public/weth.png";
-import ena from "../../../public/ena.png";
-import wbtc from "../../../public/wbtc.png";
+import Image from "next/image";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -31,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import {
   lendingPool,
   mockEna,
@@ -39,14 +33,17 @@ import {
   mockWbtc,
   mockWeth,
   priceFeed,
-  swapRouter,
 } from "@/constants/addresses";
 import { priceAbi } from "@/lib/abi/price-abi";
-import { useReadContract } from "wagmi";
-import Image from "next/image";
-import { toast } from "sonner";
 import { poolAbi } from "@/lib/abi/poolAbi";
 import { positionAbi } from "@/lib/abi/positionAbi";
+
+// Import token images
+import usdc from "../../../public/usdc.png";
+import usde from "../../../public/usde.png";
+import weth from "../../../public/weth.png";
+import ena from "../../../public/ena.png";
+import wbtc from "../../../public/wbtc.png";
 
 const tokens = [
   {
@@ -97,7 +94,6 @@ export default function TokenSwap() {
   );
 
   const { address } = useAccount();
-
   const [userAddress, setUserAddress] = useState<string | null>(null);
 
   useEffect(() => {
@@ -122,10 +118,6 @@ export default function TokenSwap() {
     functionName: "tokenBalances",
     args: [mockUsdc],
   });
-
-  console.log("1" + userAddress);
-  console.log("2" + positionAddress);
-  console.log("3" + tokenBalance);
 
   const { data: decimal } = useReadContract({
     abi: priceAbi,
@@ -247,185 +239,230 @@ export default function TokenSwap() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-64px)] p-4 relative ">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className=" overflow-hidden h-full flex flex-col">
+      <div className=" px-4 py-3">
+        <h2 className="text-white text-lg font-medium">Swap</h2>
       </div>
 
-      <Card className="w-full w-md xl:w-xl max-w-xl mx-auto backdrop-blur-xl bg-gradient-to-br from-black to-[#01031f] border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.57)] animate-gradient">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-b border-white/5">
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-            Swap
-            <span className="text-sm text-white">{positionAddress}</span> <br />
-            {/* <span className="text-sm text-white">{Number(tokenBalance)}</span> */}
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent className="space-y-6 pt-6">
-          <div className="space-y-2">
-            <Label htmlFor="from-amount" className="text-gray-300 font-medium">
-              From
-            </Label>
-            <div className="flex space-x-2 relative group">
-              <Input
-                id="from-amount"
-                type="number"
-                placeholder="0.0"
-                className="flex-grow backdrop-blur-sm bg-white/5 border border-white/10 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 disabled:bg-slate-900/50"
-                value={fromAmount}
-                onChange={handleFromAmountChange}
-                disabled={!fromToken}
-                min="0"
-                step="1"
-              />
-              <Select
-                onValueChange={(value) =>
-                  setFromToken(tokens.find((t) => t.symbol === value))
-                }
-                value={fromToken?.symbol}
-              >
-                <SelectTrigger className="w-[140px] backdrop-blur-sm bg-white/5 border border-white/10 text-white hover:bg-white/10 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300">
-                  <SelectValue placeholder="Select token" />
-                </SelectTrigger>
-                <SelectContent className="backdrop-blur-md bg-gray-900/90 border border-white/10 text-white">
-                  {tokens.map((token) => (
-                    <SelectItem
-                      key={token.symbol}
-                      value={token.symbol}
-                      className="focus:bg-[#afafaf] hover:bg-white/10"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <Image
-                          src={token.logo}
-                          alt={token.name}
-                          width={24}
-                          height={24}
-                          className="rounded-full"
-                        />
-                        <span>{token.symbol}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="absolute -bottom-0.5 left-0 right-0 h-[1px] bg-gradient-to-r from-purple-500/0 via-purple-500/50 to-blue-500/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
-            </div>
-          </div>
-
-          <div className="flex justify-center relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent to-blue-500/10 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative rounded-full h-10 w-10 backdrop-blur-sm bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:text-purple-400 transition-all duration-300 transform hover:scale-110 hover:rotate-180 group"
-              onClick={switchTokens}
-              disabled={!fromToken || !toToken}
+      <div className="p-4 space-y-4 flex-grow">
+        <div className="space-y-2">
+          <Label htmlFor="from-amount" className="text-gray-400 text-sm">
+            From
+          </Label>
+          <div className="flex space-x-2">
+            <Input
+              id="from-amount"
+              type="number"
+              placeholder="0.0"
+              className="flex-grow bg-[#0d0e24] border border-[#1a1b3a] text-white placeholder:text-gray-500 focus:border-[#2f3366] focus:ring-0 h-12"
+              value={fromAmount}
+              onChange={handleFromAmountChange}
+              disabled={!fromToken}
+              min="0"
+              step="any"
+            />
+            <Select
+              onValueChange={(value) =>
+                setFromToken(tokens.find((t) => t.symbol === value))
+              }
+              value={fromToken?.symbol}
+              defaultValue="WETH"
             >
-              <ArrowDownUp className="h-4 w-4 group-hover:stroke-purple-400 transition-colors" />
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity" />
-            </Button>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="to-amount" className="text-gray-300 font-medium">
-              To
-            </Label>
-            <div className="flex space-x-2 relative group">
-              <Input
-                id="to-amount"
-                type="number"
-                placeholder="0.0"
-                className="flex-grow backdrop-blur-sm bg-white/5 border border-white/10 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300 disabled:bg-slate-900/50"
-                value={toAmount}
-                onChange={handleToAmountChange}
-                disabled={!toToken}
-                min="0"
-                step="1"
-              />
-              <Select
-                onValueChange={(value) =>
-                  setToToken(tokens.find((t) => t.symbol === value))
-                }
-                value={toToken?.symbol}
-              >
-                <SelectTrigger className="w-[140px] backdrop-blur-sm bg-white/5 border border-white/10 text-white hover:bg-[white/10] focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300">
-                  <SelectValue placeholder="Select token" />
-                </SelectTrigger>
-                <SelectContent className="backdrop-blur-md bg-gray-900/90 border border-white/10 text-white">
-                  {tokens.map((token) => (
-                    <SelectItem
-                      key={token.symbol}
-                      value={token.symbol}
-                      className="focus:bg-[#afafaf] hover:bg-[#2f77f5]"
-                    >
-                      <div className="flex items-center space-x-2">
+              <SelectTrigger className="w-[120px] bg-[#0d0e24] border border-[#1a1b3a] text-white focus:ring-0 focus:border-[#2f3366] h-12">
+                <SelectValue placeholder="Select">
+                  {fromToken && (
+                    <div className="flex items-center space-x-2">
+                      {fromToken.logo && (
                         <Image
-                          src={token.logo}
-                          alt={token.name}
-                          width={24}
-                          height={24}
+                          src={fromToken.logo || "/placeholder.svg"}
+                          alt={fromToken.name}
+                          width={20}
+                          height={20}
                           className="rounded-full"
                         />
-                        <span>{token.symbol}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="absolute -bottom-0.5 left-0 right-0 h-[1px] bg-gradient-to-r from-blue-500/0 via-blue-500/50 to-purple-500/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+                      )}
+                      <span>{fromToken.symbol}</span>
+                    </div>
+                  )}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-[#0d0e24] border border-[#1a1b3a] text-white">
+                {tokens.map((token) => (
+                  <SelectItem
+                    key={token.symbol}
+                    value={token.symbol}
+                    className="focus:bg-[#1a1b3a] hover:bg-[#1a1b3a]"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src={token.logo || "/placeholder.svg"}
+                        alt={token.name}
+                        width={20}
+                        height={20}
+                        className="rounded-full"
+                      />
+                      <span>{token.symbol}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="flex justify-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10 rounded-full bg-[#0d0e24] border border-[#1a1b3a] text-gray-400 hover:bg-[#1a1b3a] hover:text-white"
+            onClick={switchTokens}
+            disabled={!fromToken || !toToken}
+          >
+            <ArrowDownUp className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="to-amount" className="text-gray-400 text-sm">
+            To
+          </Label>
+          <div className="flex space-x-2">
+            <Input
+              id="to-amount"
+              type="number"
+              placeholder="0.0"
+              className="flex-grow bg-[#0d0e24] border border-[#1a1b3a] text-white placeholder:text-gray-500 focus:border-[#2f3366] focus:ring-0 h-12"
+              value={toAmount}
+              onChange={handleToAmountChange}
+              disabled={!toToken}
+              min="0"
+              step="any"
+            />
+            <Select
+              onValueChange={(value) =>
+                setToToken(tokens.find((t) => t.symbol === value))
+              }
+              value={toToken?.symbol}
+              defaultValue="USDC"
+            >
+              <SelectTrigger className="w-[120px] bg-[#0d0e24] border border-[#1a1b3a] text-white focus:ring-0 focus:border-[#2f3366] h-12">
+                <SelectValue placeholder="Select">
+                  {toToken && (
+                    <div className="flex items-center space-x-2">
+                      {toToken.logo && (
+                        <Image
+                          src={toToken.logo || "/placeholder.svg"}
+                          alt={toToken.name}
+                          width={20}
+                          height={20}
+                          className="rounded-full"
+                        />
+                      )}
+                      <span>{toToken.symbol}</span>
+                    </div>
+                  )}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-[#0d0e24] border border-[#1a1b3a] text-white">
+                {tokens.map((token) => (
+                  <SelectItem
+                    key={token.symbol}
+                    value={token.symbol}
+                    className="focus:bg-[#1a1b3a] hover:bg-[#1a1b3a]"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src={token.logo || "/placeholder.svg"}
+                        alt={token.name}
+                        width={20}
+                        height={20}
+                        className="rounded-full"
+                      />
+                      <span>{token.symbol}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {fromToken && toToken && fromAmount && toAmount && (
+          <div className="text-sm text-gray-400 px-1 text-right">
+            1 {fromToken.symbol} ={" "}
+            {(Number(toAmount) / Number(fromAmount) || 0).toFixed(6)}{" "}
+            {toToken.symbol}
+          </div>
+        )}
+
+        <Button
+          className="w-full bg-[#2a3166] hover:bg-[#3a4176] text-white font-medium py-5 h-12 rounded-md"
+          onClick={handleSwap}
+          disabled={
+            !fromToken ||
+            !toToken ||
+            !fromAmount ||
+            isSwapPending ||
+            isSwapLoading
+          }
+        >
+          {isSwapPending || isSwapLoading ? (
+            <div className="flex items-center justify-center">
+              <svg
+                className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Swapping...
+            </div>
+          ) : (
+            "Swap"
+          )}
+        </Button>
+
+        {/* Additional information to fill the space */}
+        <div className="mt-10 space-y-4">
+          <div className="bg-[#252547] rounded-lg p-3">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-gray-400">Rate</span>
+              <span className="text-white">
+                {fromToken && toToken && fromAmount && toAmount
+                  ? `1 ${fromToken.symbol} = ${(
+                      Number(toAmount) / Number(fromAmount)
+                    ).toFixed(6)} ${toToken.symbol}`
+                  : "-"}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-gray-400">Price Impact</span>
+              <span className="text-green-400">~0.05%</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Minimum Received</span>
+              <span className="text-white">
+                {toAmount && toToken
+                  ? `${(Number(toAmount) * 0.995).toFixed(6)} ${toToken.symbol}`
+                  : "-"}
+              </span>
             </div>
           </div>
-
-          {fromToken && toToken && fromAmount && toAmount && (
-            <div className="text-xs text-gray-400 px-2 text-right animate-fade-in">
-              1 {fromToken.symbol} ≈{" "}
-              {(Number(toAmount) / Number(fromAmount) || 0).toFixed(6)}{" "}
-              {toToken.symbol}
-            </div>
-          )}
-        </CardContent>
-
-        <CardFooter className="bg-gradient-to-r from-purple-500/5 to-blue-500/5 border-t border-white/5 pt-4">
-          <Button
-            className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-medium py-6 rounded-xl shadow-lg hover:shadow-purple-500/20 transition-all duration-300 transform hover:translate-y-[-2px]"
-            onClick={handleSwap}
-            disabled={
-              !fromToken ||
-              !toToken ||
-              !fromAmount ||
-              isSwapPending ||
-              isSwapLoading
-            }
-          >
-            {isSwapPending || isSwapLoading ? (
-              <div className="flex items-center justify-center">
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Swapping...
-              </div>
-            ) : (
-              "Swap"
-            )}
-          </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

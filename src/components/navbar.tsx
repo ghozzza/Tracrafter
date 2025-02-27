@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { PiggyBank, LineChart, Menu, X, LayoutDashboard } from "lucide-react";
+import { PiggyBank, LineChart, Menu, X, LayoutDashboard, Wallet } from "lucide-react";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 
@@ -95,20 +95,16 @@ const Navbar: React.FC = () => {
           </Link>
           <div className="hidden md:flex items-center space-x-6">
             <NavLink href="/lending">
-              <LineChart className="h-3 w-3 group-hover:scale-110 transition-transform" />
+            <Wallet className="h-3 w-3 group-hover:scale-110 transition-transform"  />
               <span>Lending</span>
             </NavLink>
             <NavLink href="/borrow">
               <PiggyBank className="h-3 w-3 group-hover:scale-110 transition-transform" />
               <span>Borrow</span>
             </NavLink>
-            <NavLink href="/lendingpool">
-              <LayoutDashboard className="h-3 w-3 group-hover:scale-110 transition-transform" />
+            <NavLink href="/trade">
+              <LineChart className="h-3 w-3 group-hover:scale-110 transition-transform" />
               <span>Trade</span>
-            </NavLink>
-            <NavLink href="/dummy">
-              <LayoutDashboard className="h-3 w-3 group-hover:scale-110 transition-transform" />
-              <span>Dummy</span>
             </NavLink>
           </div>
         </div>

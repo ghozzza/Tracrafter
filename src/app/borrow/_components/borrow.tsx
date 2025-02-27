@@ -217,9 +217,9 @@ export default function BorrowPage() {
                     </div>
                   ) : (
                     <div className="grid grid-cols-3 gap-2 justify-center content-center text-center text-white ">
-                      <div className="bg-slate-600 w-full">Assets</div>
-                      <div className="bg-slate-600 w-full">Value</div>
-                      <div className="bg-slate-600 w-full">Actions</div>
+                      <div className="">Assets</div>
+                      <div className="">Value</div>
+                      <div className="">Actions</div>
                       {/* WETH */}
                       <PositionToken
                         name={findNameToken(mockWeth)}

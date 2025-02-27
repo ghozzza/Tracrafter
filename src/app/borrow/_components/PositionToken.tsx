@@ -38,11 +38,11 @@ const PositionToken = (props: any) => {
   };
   return (
     <>
-      <div className="bg-slate-600 w-full py-2">
+      <div className=" py-2">
         {/* <p>${findNameToken(mockUsdc)}</p> */}
         <p>${props.name}</p>
       </div>
-      <div className="bg-slate-600 w-full py-2">
+      <div className=" py-2">
         <p>
           {collateralAddress == props.address
             ? convertRealAmount(Number(userCollateral), props.decimal).toFixed(
@@ -54,7 +54,7 @@ const PositionToken = (props: any) => {
               ).toFixed(2)}
         </p>
       </div>
-      <div className="bg-slate-600 w-full py-2">
+      <div className=" py-2">
         <div className="flex justify-center gap-2">
           <div>
             <Link href={"/trade"}>
