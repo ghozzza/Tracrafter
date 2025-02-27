@@ -27,7 +27,7 @@ const NavLink: React.FC<NavLinkProps> = ({ href, children, onClick }) => {
       className={`flex items-center space-x-3 transition-colors py-4 px-6 w-full group relative
         ${
           isActive
-            ? "text-white bg-white/5"
+            ? "text-white"
             : "text-gray-200 hover:text-white hover:bg-white/5"
         }`}
     >

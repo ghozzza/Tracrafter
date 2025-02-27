@@ -12,7 +12,6 @@ import {
   useReadContract,
 } from "wagmi";
 import Image from "next/image";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,11 +38,11 @@ import { poolAbi } from "@/lib/abi/poolAbi";
 import { positionAbi } from "@/lib/abi/positionAbi";
 
 // Import token images
-import usdc from "../../../public/usdc.png";
-import usde from "../../../public/usde.png";
-import weth from "../../../public/weth.png";
-import ena from "../../../public/ena.png";
-import wbtc from "../../../public/wbtc.png";
+import usdc from "../../../../public/usdc.png";
+import usde from "../../../../public/usde.png";
+import weth from "../../../../public/weth.png";
+import ena from "../../../../public/ena.png";
+import wbtc from "../../../../public/wbtc.png";
 
 const tokens = [
   {
@@ -113,7 +112,7 @@ export default function TokenSwap() {
   });
 
   const { data: tokenBalance } = useReadContract({
-    address: positionAddress,
+    address: positionAddress as `0x${string}`,
     abi: positionAbi,
     functionName: "tokenBalances",
     args: [mockUsdc],
@@ -217,7 +216,7 @@ export default function TokenSwap() {
 
   const handleSwap = async () => {
     if (!fromToken || !toToken || !fromAmount || Number(fromAmount) <= 0) {
-      toast.error("Please enter valid swap details");
+      Error("Please enter valid swap details");
       return;
     }
 
@@ -231,10 +230,8 @@ export default function TokenSwap() {
         args: [toToken.tokenAddress, fromToken.tokenAddress, amountIn],
       });
 
-      toast.success("Swap initiated!");
     } catch (error) {
       console.error("Swap error:", error);
-      toast.error("Failed to swap tokens");
     }
   };
 

@@ -18,7 +18,6 @@ import { lendingPool } from "@/constants/addresses";
 import { ArrowUpRight, Loader2, Wallet } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 import { useSupplyUser } from "@/hooks/useTotalSuppy";
 
 export const WithdrawDialog = () => {
@@ -30,13 +29,12 @@ export const WithdrawDialog = () => {
 
   const handleWithdraw = async () => {
     if (!shares || Number.parseFloat(shares) <= 0) {
-      toast.error("Please enter a valid amount of shares to withdraw");
+      Error("Please enter a valid amount of shares to withdraw");
       return;
     }
 
     const sharesAmount = BigInt(parseUnits(shares, 6));
     try {
-      toast.loading("Withdrawing...");
       await writeContract({
         address: lendingPool,
         abi: poolAbi,
@@ -44,14 +42,10 @@ export const WithdrawDialog = () => {
         args: [sharesAmount],
       });
 
-      toast.dismiss();
-      toast.success("Withdrawal successful!");
       setShares("0");
       setIsOpen(false);
     } catch (error) {
       console.error("Withdrawal failed:", error);
-      toast.dismiss();
-      toast.error("Withdrawal failed. Please try again.");
     }
   };
 

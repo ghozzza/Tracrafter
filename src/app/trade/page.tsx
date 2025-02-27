@@ -4,8 +4,7 @@ import ChartContainer from "@/components/trading/ChartContainer";
 import OrderBook from "@/components/trading/OrderBook";
 import TradeList from "@/components/trading/TradeList";
 import PositionList from "@/components/trading/PositionList";
-import TradingForm from "@/components/trading/TradingForm";
-import TokenSwap from "@/app/swap/page";
+import TokenSwap from "./_components/swap";
 
 export default function TradingPage() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
