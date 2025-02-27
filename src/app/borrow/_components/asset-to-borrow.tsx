@@ -122,31 +122,27 @@ export default function AssetsToBorrow() {
           <div className="col-span-4 flex items-center gap-2">
             <Image
               src={weth}
-              alt="USDC logo"
+              alt={`${getSymbol(collateralToken) || "Token"} logo`}
               width={24}
               height={24}
               className="rounded-full"
             />
             <span className="font-medium text-slate-400">
               {getSymbol(collateralToken) ?? (
-                <Skeleton className="h-6 w-[100px] bg-slate-400" />
+                <Skeleton className="h-6 w-20 bg-slate-400" />
               )}
             </span>
           </div>
-          <div className="col-span-5 mx-2 text-slate-400 mt-1">
-            {collateralBalance != 0 ? collateralBalance : 0}
+          <div className="col-span-5 text-slate-400 flex items-center">
+            {collateralBalance !== 0 ? collateralBalance : 0}
           </div>
-          <div className="flex flex-row gap-2">
-            <div className="col-span-4 flex ">
-              {getSymbol(collateralToken) ? (
-                <SupplyDialog token={getSymbol(collateralToken)} />
-              ) : (
-                <Skeleton className="h-8 w-[150px] bg-slate-400" />
-              )}
-            </div>
-            <div className="col-span-4 flex ">
-              <WithdrawDialog />
-            </div>
+          <div className="col-span-3 flex items-center justify-end gap-2">
+            {getSymbol(collateralToken) ? (
+              <SupplyDialog token={getSymbol(collateralToken)} />
+            ) : (
+              <Skeleton className="h-8 w-20 bg-slate-400" />
+            )}
+            <WithdrawDialog />
           </div>
         </div>
 
