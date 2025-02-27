@@ -38,7 +38,7 @@ const PositionToken = (props: any) => {
   };
   return (
     <>
-      <div className=" py-2">
+      <div className=" py-3">
         {/* <p>${findNameToken(mockUsdc)}</p> */}
         <p>${props.name}</p>
       </div>
@@ -59,7 +59,6 @@ const PositionToken = (props: any) => {
           <div>
             <Link href={"/trade"}>
               <Button
-                size="sm"
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 Trade

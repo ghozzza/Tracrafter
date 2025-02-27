@@ -112,7 +112,7 @@ export default function AssetsToBorrow() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-slate-300 text-lg font-semibold">Collateral</div>
-        <div className="grid grid-cols-12 gap-4 bg-[#151941] p-4 rounded-lg">
+        <div className="grid grid-cols-12 gap-4 bg-[#161835] p-4 rounded-lg">
           <div className="col-span-4 flex items-center gap-2">
             <Image
               src={weth}
@@ -147,7 +147,7 @@ export default function AssetsToBorrow() {
         </div>
 
         <div className="text-slate-300 text-lg font-semibold mt-6">Borrow</div>
-        <div className="grid grid-cols-12 gap-4 bg-[#151941] p-4 rounded-lg">
+        <div className="grid grid-cols-12 gap-4 bg-[#161835] p-4 rounded-lg">
           <div className="col-span-4 flex items-center gap-2">
             <Image
               src={usdc}

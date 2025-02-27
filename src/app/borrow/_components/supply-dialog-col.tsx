@@ -163,7 +163,7 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          className="bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-600 hover:to-teal-500 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 rounded-lg"
+          className="bg-gradient-to-r from-indigo-400 to-purple-500 hover:from-purple-600 hover:to-indigo-500 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 rounded-lg"
           size="lg"
         >
           Supply {token}
@@ -172,7 +172,7 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
       <DialogContent className="sm:max-w-md bg-gradient-to-b from-white to-slate-50 border-0 shadow-xl rounded-xl">
         <DialogHeader className="pb-2 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-emerald-500" />
+            <Shield className="h-6 w-6 text-purple-500" />
             <DialogTitle className="text-xl font-bold text-slate-800">
               Supply {token} as Collateral
             </DialogTitle>
@@ -194,7 +194,7 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
                 </h3>
                 <Badge
                   variant="outline"
-                  className="bg-emerald-50 text-emerald-700 border-emerald-200"
+                  className="bg-purple-50 text-purple-700 border-purple-200"
                 >
                   Collateral
                 </Badge>
@@ -224,7 +224,7 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
                   </span>
                   <button
                     onClick={() => setAmount(wethBalance)}
-                    className="text-xs p-0.5 border border-green-500 rounded-md text-green-500 hover:bg-green-200"
+                    className="text-xs p-0.5 border border-purple-500 rounded-md text-purple-500 hover:bg-purple-200"
                   >
                     Max
                   </button>
@@ -242,8 +242,8 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
                 <div
                   className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${
                     !hasPosition
-                      ? "bg-emerald-100 text-emerald-600"
-                      : "bg-emerald-500 text-white"
+                      ? "text-purple-700"
+                      : "bg-purple-500 text-white"
                   }`}
                 >
                   {hasPosition ? "✓" : "1"}
@@ -259,13 +259,13 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
                 </span>
               </div>
               <div className="flex items-center">
-                <div className="w-4 h-4 rounded-full mr-2 flex items-center justify-center bg-emerald-100 text-emerald-600">
+                <div className="w-4 h-4 rounded-full mr-2 flex items-center justify-center text-purple-700">
                   {hasPosition ? "1" : "2"}
                 </div>
                 <span className="text-slate-700">Approve token</span>
               </div>
               <div className="flex items-center">
-                <div className="w-4 h-4 rounded-full mr-2 flex items-center justify-center bg-emerald-100 text-emerald-600">
+                <div className="w-4 h-4 rounded-full mr-2 flex items-center justify-center text-purple-700">
                   {hasPosition ? "2" : "3"}
                 </div>
                 <span className="text-slate-700">Supply collateral</span>
@@ -281,7 +281,7 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
             className={`w-full h-12 text-base font-medium rounded-lg ${
               isProcessing
                 ? "bg-slate-200 text-slate-500"
-                : "bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-600 hover:to-teal-500 text-white shadow-md hover:shadow-lg"
+                : "bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white shadow-md hover:shadow-lg"
             }`}
           >
             {isProcessing ? (

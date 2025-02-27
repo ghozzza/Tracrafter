@@ -160,10 +160,10 @@ export const RepayDialog = () => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          className="bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 rounded-lg border-0"
+          className="bg-gradient-to-r from-blue-600 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 rounded-lg border-0"
           size="lg"
         >
-          <ArrowDown className="mr-2 h-5 w-5" /> Repay
+           Repay $USDC
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md bg-gradient-to-b from-white to-slate-50 border-0 shadow-xl rounded-xl">

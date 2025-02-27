@@ -163,7 +163,7 @@ export const RepaySelectedToken = (props: any) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Repay</Button>
+        <Button className="bg-gradient-to-r from-blue-500 to-indigo-400 hover:from-blue-600 hover:to-indigo-500" >Repay</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Repay Loan</DialogTitle>
