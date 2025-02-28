@@ -57,7 +57,7 @@ TraCrafter was built to overcome key limitations in traditional DeFi systems and
 - **Website:** [https://smart-col-fe.vercel.app/](https://smart-col-fe.vercel.app/)
 - **Documentation:** [https://tracrafter-docs.gitbook.io/tracrafter](https://tracrafter-docs.gitbook.io/tracrafter)
 - **GitHub Repositories:** [https://github.com/ghozzza/Tracrafter](https://github.com/ghozzza/Tracrafter)
-- **Video Demonstration:** [YouTube Link](link-yt)
+- **Video Demonstration:** [YouTube Link](https://youtu.be/eRDcvi2XQKQ?si=YlDI2jU2NtVKGUZc)
 - **Presentation Slides:** [Presentation Link](https://www.canva.com/design/DAGgAnjr4u4/qvZ27lBgGbxf8PS5liC-iw/edit?utm_content=DAGgAnjr4u4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 ## 💻 Technology Stack
