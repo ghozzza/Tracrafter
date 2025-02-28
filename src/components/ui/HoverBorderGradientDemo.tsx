@@ -1,10 +1,11 @@
 "use client";
 import React from "react";
 import { HoverBorderGradient } from "./hover-border-gradient";
+import Link from "next/link";
 
 export function HoverBorderGradientDemo() {
   return (
-    <div className="flex justify-center text-center">
+    <Link href={"/lending"} className="flex justify-center text-center">
       <HoverBorderGradient
         containerClassName="rounded-full"
         as="button"
@@ -12,6 +13,6 @@ export function HoverBorderGradientDemo() {
       >
         <span>Start now</span>
       </HoverBorderGradient>
-    </div>
+    </Link>
   );
 }
