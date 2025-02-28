@@ -11,5 +11,5 @@ export const useBorrowBalance = () => {
     args: [address],
   });
 
-  return borrowBalance ? (Number(borrowBalance) / 1e6).toFixed(2) : "0.00";
+  return borrowBalance ? (Number(borrowBalance) / 1e6) : "0.00";
 };

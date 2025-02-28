@@ -6,14 +6,14 @@ export default function TradingForm() {
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* Buy Form */}
-      <div className="p-4 rounded-lg bg-[#252547]">
+      <div className="p-4 rounded-lg bg-[#252547] bg-opacity-50">
         <h3 className="text-lg font-semibold mb-4 text-green-400">Buy</h3>
         <div className="space-y-4">
           <div>
             <label className="block text-sm text-gray-400 mb-1">Price</label>
             <input
               type="number"
-              className="w-full bg-[#1C1C3B] border border-gray-700 rounded p-2 text-white"
+              className="w-full  border border-gray-700 rounded p-2 text-white"
               placeholder="0.00"
             />
           </div>
@@ -21,7 +21,7 @@ export default function TradingForm() {
             <label className="block text-sm text-gray-400 mb-1">Amount</label>
             <input
               type="number"
-              className="w-full bg-[#1C1C3B] border border-gray-700 rounded p-2 text-white"
+              className="w-full  border border-gray-700 rounded p-2 text-white"
               placeholder="0.00"
             />
           </div>
@@ -39,7 +39,7 @@ export default function TradingForm() {
             <label className="block text-sm text-gray-400 mb-1">Price</label>
             <input
               type="number"
-              className="w-full bg-[#1C1C3B] border border-gray-700 rounded p-2 text-white"
+              className="w-full  border border-gray-700 rounded p-2 text-white"
               placeholder="0.00"
             />
           </div>
@@ -47,7 +47,7 @@ export default function TradingForm() {
             <label className="block text-sm text-gray-400 mb-1">Amount</label>
             <input
               type="number"
-              className="w-full bg-[#1C1C3B] border border-gray-700 rounded p-2 text-white"
+              className="w-full  border border-gray-700 rounded p-2 text-white"
               placeholder="0.00"
             />
           </div>

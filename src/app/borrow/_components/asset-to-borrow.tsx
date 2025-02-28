@@ -135,7 +135,7 @@ export default function AssetsToBorrow() {
             {isBalanceLoading ? (
               <Skeleton className="h-6 w-20 bg-slate-400" />
             ) : (
-              collateralBalance ?? 0
+              Number(collateralBalance) < 1 / 1e15 ? 0 : collateralBalance
             )}
           </div>
           <div className="col-span-3 flex items-center justify-end gap-2">

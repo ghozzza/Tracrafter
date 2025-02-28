@@ -21,7 +21,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
-
 const useWethBalance = () => {
   const { address } = useAccount();
   const { data } = useReadContract({
@@ -86,7 +85,10 @@ const AmountInput = ({
         <div className="mt-3 text-xs text-slate-500 flex items-center justify-between">
           <div>
             <span>Your Collateral : </span>
-            <span className="font-medium">{collateralBalance} $WETH</span>
+            <span className="font-medium">
+              {collateralBalance < 1 / 1e15 ? 0 : collateralBalance}
+              $WETH
+            </span>
           </div>
           <button
             className="text-xs p-1 text-purple-700 border border-purple-700 rounded-md hover:bg-purple-400"
@@ -114,7 +116,7 @@ export const WithdrawDialog = () => {
       return;
     }
 
-    const amount = BigInt(parseUnits(wethAmount, 18));
+    const amount = Number(wethAmount) * 10 ** 18;
 
     try {
       toast.loading("Withdrawing collateral...");
