@@ -119,21 +119,15 @@ export const WithdrawDialog = () => {
     const amount = Number(wethAmount) * 10 ** 18;
 
     try {
-      toast.loading("Withdrawing collateral...");
       await writeContract({
         address: lendingPool,
         abi: poolAbi,
         functionName: "withdrawCollateral",
         args: [amount],
       });
-
-      toast.dismiss();
-      toast.success("Withdrawal successful!");
       setWethAmount("0");
       setIsOpen(false);
     } catch (error) {
-      console.error("Withdrawal failed:", error);
-      toast.dismiss();
       toast.error("Withdrawal failed. Please try again.");
     }
   };

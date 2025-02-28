@@ -27,7 +27,6 @@ import { useSupplyAssets, useSupplyShares } from "@/hooks/useTotalSuppy";
 import { ArrowDown, CreditCard, DollarSign, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 
 const useUSDCBalance = () => {
   const { address } = useAccount();
@@ -60,7 +59,7 @@ const useBorrowBalance = () => {
     args: [address],
   });
 
-  return borrowBalance ? (Number(borrowBalance) / 1e6).toFixed(2) : "0.00";
+  return borrowBalance ? Number(borrowBalance) / 1e6 : "0.00";
 };
 
 const AmountInput = ({ value, onChange, token, balance, label }: any) => {
@@ -134,7 +133,7 @@ export const RepayDialog = () => {
 
   const handleApproveAndRepay = async () => {
     if (!usdcAmount || Number.parseFloat(usdcAmount) <= 0) {
-      toast.error("Please enter a valid amount to repay");
+      Error("Please enter a valid amount to repay");
       return;
     }
 
@@ -142,7 +141,6 @@ export const RepayDialog = () => {
     const result = Math.round((amount * supplyAssets) / supplyShares + amount);
 
     try {
-      toast.loading("Approving USDC spending...");
       await writeContract({
         address: mockUsdc,
         abi: mockErc20Abi,
@@ -150,22 +148,16 @@ export const RepayDialog = () => {
         args: [lendingPool, BigInt(result)],
       });
 
-      toast.loading("Repaying loan...");
       await writeContract({
         address: lendingPool,
         abi: poolAbi,
         functionName: "repayByPosition",
         args: [amount],
       });
-
-      toast.dismiss();
-      toast.success("Repayment successful!");
       setUsdcAmount("0");
       setIsOpen(false);
     } catch (error) {
-      console.error("Transaction failed:", error);
-      toast.dismiss();
-      toast.error("Repayment failed. Please try again.");
+      Error("Transaction failed:");
     }
   };
 

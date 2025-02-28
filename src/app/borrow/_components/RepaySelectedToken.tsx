@@ -19,7 +19,6 @@ import { priceAbi } from "@/lib/abi/price-abi";
 import { ArrowDown, CreditCard, DollarSign, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 import { useBorrowBalance } from "@/hooks/useBorrowBalance";
 import { useWethBalance } from "@/hooks/useTokenBalance";
 
@@ -123,7 +122,7 @@ export const RepaySelectedToken = (props: any) => {
 
   const handleApproveAndRepay = async () => {
     if (!valueAmount || Number.parseFloat(valueAmount) <= 0) {
-      toast.error("Please enter a valid amount to repay");
+      Error("Please enter a valid amount to repay");
       return;
     }
 
@@ -131,7 +130,6 @@ export const RepaySelectedToken = (props: any) => {
     const result = Math.round(amount + amount);
 
     try {
-      toast.loading("Approving USDC spending...");
       await writeContract({
         address: mockUsdc,
         abi: mockErc20Abi,
@@ -139,22 +137,16 @@ export const RepaySelectedToken = (props: any) => {
         args: [lendingPool, BigInt(result)],
       });
 
-      toast.loading("Repaying loan...");
       await writeContract({
         address: lendingPool,
         abi: poolAbi,
         functionName: "repayWithSelectedToken",
         args: [BigInt(amount), props.address],
       });
-
-      toast.dismiss();
-      toast.success("Repayment successful!");
       setValueAmount("0");
       setIsOpen(false);
     } catch (error) {
-      console.error("Transaction failed:", error);
-      toast.dismiss();
-      toast.error("Repayment failed. Please try again.");
+      alert("Transaction failed:");
     }
   };
 

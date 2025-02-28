@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import { poolAbi } from "@/lib/abi/poolAbi";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { lendingPool, mockWeth } from "@/constants/addresses";
@@ -26,6 +25,7 @@ import { ArrowRight, DollarSign, Loader2, Shield } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useWethBalance } from "@/hooks/useTokenBalance";
+import { Alert } from "@/components/ui/alert";
 
 interface SupplyDialogProps {
   token: string | undefined;
@@ -94,7 +94,7 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
   const handleSupply = async () => {
     try {
       if (!amount || Number.parseFloat(amount) <= 0) {
-        toast.error("Please enter a valid amount to supply");
+        alert("Please enter a valid amount to supply");
         return;
       }
 
@@ -102,21 +102,15 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
       const parsedAmount = parseUnits(amount, decimals);
 
       if (!hasPosition) {
-        toast.loading("Creating position...");
-
         await createPositionTransaction({
           address: lendingPool,
           abi: poolAbi,
           functionName: "createPosition",
           args: [],
         });
-
-        toast.dismiss();
-        toast.success("Position created successfully!");
         await refetchPosition();
       }
 
-      toast.loading("Approving token for supply...");
 
       await approveTransaction({
         abi: mockErc20Abi,
@@ -125,8 +119,6 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
         args: [lendingPool, parsedAmount],
       });
 
-      toast.dismiss();
-      toast.loading(`Supplying ${token} as collateral...`);
 
       await supplyTransaction({
         address: lendingPool,
@@ -134,14 +126,9 @@ export default function SupplyDialogCol({ token }: SupplyDialogProps) {
         functionName: "supplyCollateralByPosition",
         args: [parsedAmount],
       });
-
-      toast.dismiss();
-      toast.success(`Successfully supplied ${amount} ${token} as collateral!`);
       setAmount("");
     } catch (error) {
-      console.error("Supply error:", error);
-      toast.dismiss();
-      toast.error("Failed to supply collateral");
+      alert("Supply error:");
     }
   };
 

@@ -24,7 +24,6 @@ import { ArrowDown, CreditCard, DollarSign, Loader2 } from "lucide-react";
 import { mockErc20Abi } from "@/lib/abi/mockErc20Abi";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 import { useUsdcBalance } from "@/hooks/useTokenBalance";
 
 interface BorrowDialogProps {
@@ -89,29 +88,21 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
   const handleBorrow = async () => {
     try {
       if (!amount || Number.parseFloat(amount) <= 0) {
-        toast.error("Please enter a valid borrow amount");
-        return;
+        Error("Please enter a valid borrow amount");
       }
 
       const decimal = 6;
       const parsedAmount = parseUnits(amount, decimal);
 
       if (!hasPosition) {
-        toast.loading("Creating position...");
-
         await createPositionTransaction({
           address: lendingPool,
           abi: poolAbi,
           functionName: "createPosition",
           args: [],
         });
-
-        toast.dismiss();
-        toast.success("Position created successfully!");
         await refetchPosition();
       }
-
-      toast.loading("Approving token for borrowing...");
 
       await approveTransaction({
         address: mockUsdc,
@@ -120,9 +111,6 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
         args: [lendingPool, parsedAmount],
       });
 
-      toast.dismiss();
-      toast.loading(`Borrowing ${token}...`);
-
       await borrowTransaction({
         address: lendingPool,
         abi: poolAbi,
@@ -130,13 +118,9 @@ export default function BorrowDialog({ token }: BorrowDialogProps) {
         args: [parsedAmount],
       });
 
-      toast.dismiss();
-      toast.success(`Successfully borrowed ${amount} ${token}!`);
       setAmount("");
     } catch (error) {
-      console.error("Borrow error:", error);
-      toast.dismiss();
-      toast.error("Failed to borrow tokens");
+      Error("Borrow error:");
     }
   };
 
