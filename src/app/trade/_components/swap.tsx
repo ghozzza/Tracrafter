@@ -251,7 +251,7 @@ export default function TokenSwap() {
               id="from-amount"
               type="number"
               placeholder="0.0"
-              className="flex-grow bg-[#0d0e24] border border-[#1a1b3a] text-white placeholder:text-gray-500 focus:border-[#2f3366] focus:ring-0 h-12"
+              className="flex-grow bg-[#0d0e24] border border-[#1a1b3a] text-white placeholder:text-gray-500  focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300 h-12"
               value={fromAmount}
               onChange={handleFromAmountChange}
               disabled={!fromToken}
@@ -263,10 +263,9 @@ export default function TokenSwap() {
                 setFromToken(tokens.find((t) => t.symbol === value))
               }
               value={fromToken?.symbol}
-              defaultValue="WETH"
             >
               <SelectTrigger className="w-[120px] bg-[#0d0e24] border border-[#1a1b3a] text-white focus:ring-0 focus:border-[#2f3366] h-12">
-                <SelectValue placeholder="Select">
+                <SelectValue placeholder={toToken ? undefined : "Select"}>
                   {fromToken && (
                     <div className="flex items-center space-x-2">
                       {fromToken.logo && (
@@ -288,7 +287,7 @@ export default function TokenSwap() {
                   <SelectItem
                     key={token.symbol}
                     value={token.symbol}
-                    className="focus:bg-[#1a1b3a] hover:bg-[#1a1b3a]"
+                    className="focus:bg-[#7d81dc] hover:bg-[#1a1b3a]"
                   >
                     <div className="flex items-center space-x-2">
                       <Image
@@ -311,11 +310,11 @@ export default function TokenSwap() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 rounded-full bg-[#0d0e24] border border-[#1a1b3a] text-gray-400 hover:bg-[#1a1b3a] hover:text-white"
+            className=" relative rounded-full h-10 w-10 backdrop-blur-sm bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:text-purple-400 transition-all duration-300 transform hover:scale-110 hover:rotate-180 group"
             onClick={switchTokens}
             disabled={!fromToken || !toToken}
           >
-            <ArrowDownUp className="h-4 w-4" />
+            <ArrowDownUp className="h-4 w-4 group-hover:stroke-purple-400 transition-colors" />
           </Button>
         </div>
 
@@ -328,7 +327,7 @@ export default function TokenSwap() {
               id="to-amount"
               type="number"
               placeholder="0.0"
-              className="flex-grow bg-[#0d0e24] border border-[#1a1b3a] text-white placeholder:text-gray-500 focus:border-[#2f3366] focus:ring-0 h-12"
+              className="flex-grow bg-[#0d0e24] border border-[#1a1b3a] text-white placeholder:text-gray-500 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300 h-12"
               value={toAmount}
               onChange={handleToAmountChange}
               disabled={!toToken}
@@ -340,10 +339,9 @@ export default function TokenSwap() {
                 setToToken(tokens.find((t) => t.symbol === value))
               }
               value={toToken?.symbol}
-              defaultValue="USDC"
             >
               <SelectTrigger className="w-[120px] bg-[#0d0e24] border border-[#1a1b3a] text-white focus:ring-0 focus:border-[#2f3366] h-12">
-                <SelectValue placeholder="Select">
+                <SelectValue placeholder={toToken ? undefined : "Select"}>
                   {toToken && (
                     <div className="flex items-center space-x-2">
                       {toToken.logo && (
@@ -365,7 +363,7 @@ export default function TokenSwap() {
                   <SelectItem
                     key={token.symbol}
                     value={token.symbol}
-                    className="focus:bg-[#1a1b3a] hover:bg-[#1a1b3a]"
+                    className="focus:bg-[#7d81dc] hover:bg-[#1a1b3a]"
                   >
                     <div className="flex items-center space-x-2">
                       <Image
@@ -393,7 +391,7 @@ export default function TokenSwap() {
         )}
 
         <Button
-          className="w-full bg-[#2a3166] hover:bg-[#3a4176] text-white font-medium py-5 h-12 rounded-md"
+          className="w-full bg-gradient-to-r from-blue-800 to-blue-500 hover:from-blue-600 hover:to-blue-800 text-white font-medium py-6 rounded-xl shadow-lg hover:shadow-purple-500/20 transition-all duration-300 transform hover:translate-y-[-2px]"
           onClick={handleSwap}
           disabled={
             !fromToken ||
@@ -440,8 +438,8 @@ export default function TokenSwap() {
               <span className="text-white">
                 {fromToken && toToken && fromAmount && toAmount
                   ? `1 ${fromToken.symbol} = ${(
-                      Number(toAmount) / Number(fromAmount)
-                    ).toFixed(6)} ${toToken.symbol}`
+                    Number(toAmount) / Number(fromAmount)
+                  ).toFixed(6)} ${toToken.symbol}`
                   : "-"}
               </span>
             </div>
