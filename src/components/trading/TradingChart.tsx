@@ -12,7 +12,7 @@ export default function TradingChart() {
   const wsRef = useRef<WebSocket | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
-  const [symbol, setSymbol] = useState("btcusdt"); // Default BTC/USDT
+  const [symbol, setSymbol] = useState("wethusdc"); // Updated default to WETH/USDC
   const [interval, setInterval] = useState("1d"); // Default 1 day
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,11 +24,19 @@ export default function TradingChart() {
     try {
       let formattedSymbol = symbol.toUpperCase();
 
-      if (formattedSymbol === "WETHUSDT") {
-        formattedSymbol = "ETHWUSDT";
-      } else if (formattedSymbol === "ETHENAUSDT") {
-        formattedSymbol = "EHTUSDT";
+      // Handle special mappings for certain symbols
+      const symbolMappings: Record<string, string> = {
+        "WETHUSDC": "ETHUSDC", // Map WETH/USDC to ETH/USDC on Binance
+        "WBTCUSDC": "BTCUSDC", // Map WBTC/USDC to BTC/USDC on Binance
+        "WBTCWETH": "BTCETH",  // Map WBTC/WETH to BTC/ETH on Binance
+        "WETHWBTC": "ETHBTC",  // Map WETH/WBTC to ETH/BTC on Binance
+      };
+
+      if (symbolMappings[formattedSymbol]) {
+        formattedSymbol = symbolMappings[formattedSymbol];
       }
+
+      console.log(`Fetching data for symbol: ${formattedSymbol}`);
 
       let response = await fetch(
         `${BINANCE_REST_API}?symbol=${formattedSymbol}&interval=${interval}&limit=100`
@@ -52,9 +60,11 @@ export default function TradingChart() {
         const availableSymbols = exchangeInfo.symbols.map((s: any) => s.symbol);
 
         console.log(
-          `Available symbols similar to ${symbol.toUpperCase()}:`,
+          `Available symbols similar:`,
           availableSymbols.filter(
-            (s: string) => s.includes("ETH") && s.includes("USDT")
+            (s: string) => 
+              (s.includes("ETH") || s.includes("BTC")) && 
+              (s.includes("USDC") || s.includes("ETH") || s.includes("BTC"))
           )
         );
 
@@ -188,12 +198,26 @@ export default function TradingChart() {
         }
 
         const data = await response.json();
+        
+        // Handle symbol mapping for WebSocket connection
+        let wsSymbol = symbol.toUpperCase();
+        const symbolMappings: Record<string, string> = {
+          "WETHUSDC": "ETHUSDC",
+          "WBTCUSDC": "BTCUSDC",
+          "WBTCWETH": "BTCETH",
+          "WETHWBTC": "ETHBTC",
+        };
+
+        if (symbolMappings[wsSymbol]) {
+          wsSymbol = symbolMappings[wsSymbol];
+        }
+        
         const symbolInfo = data.symbols.find(
-          (s: any) => s.symbol.toLowerCase() === symbol.toUpperCase()
+          (s: any) => s.symbol === wsSymbol
         );
 
         if (!symbolInfo) {
-          console.warn(`Symbol ${symbol.toUpperCase()} not found on Binance`);
+          console.warn(`Symbol ${wsSymbol} not found on Binance`);
           return; // Don't connect WebSocket for invalid symbols
         }
 
@@ -207,7 +231,7 @@ export default function TradingChart() {
           ws.send(
             JSON.stringify({
               method: "SUBSCRIBE",
-              params: [`${symbol.toLowerCase()}@kline_${interval}`],
+              params: [`${wsSymbol.toLowerCase()}@kline_${interval}`],
               id: 1,
             })
           );
@@ -257,12 +281,12 @@ export default function TradingChart() {
             }}
             disabled={isLoading}
           >
+            <option value="wethusdc">WETH/USDC</option>
+            <option value="wbtcusdc">WBTC/USDC</option>
+            <option value="wbtcweth">WBTC/WETH</option>
+            <option value="wethwbtc">WETH/WBTC</option>
             <option value="btcusdt">BTC/USDT</option>
             <option value="ethusdt">ETH/USDT</option>
-            <option value="bnbusdt">BNB/USDT</option>
-            <option value="solusdt">SOL/USDT</option>
-            <option value="dogeusdt">DOGE/USDT</option>
-            <option value="xrpusdt">XRP/USDT</option>
           </select>
         </div>
 
@@ -275,12 +299,12 @@ export default function TradingChart() {
             disabled={isLoading}
           >
             <option value="1m">1 Min</option>
-            <option value="30m">5 Min</option>
             <option value="15m">15 Min</option>
             <option value="1h">1 H</option>
             <option value="4h">4 H</option>
             <option value="1d">1 D</option>
             <option value="1w">1 W</option>
+            <option value="1M">1 Month</option>
           </select>
         </div>
       </div>
