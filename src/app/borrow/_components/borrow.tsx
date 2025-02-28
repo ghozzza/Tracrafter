@@ -36,6 +36,8 @@ import { useSupplyAssets, useSupplyShares } from "@/hooks/useTotalSuppy";
 import { positionAbi } from "@/lib/abi/positionAbi";
 import Link from "next/link";
 import PositionToken from "./PositionToken";
+import { userBorrowShares } from "../../../lib/utils/read/userBorrowShares";
+import { useBorrowBalance } from "@/hooks/useBorrowBalance";
 
 interface AssetItem {
   id: string;
@@ -116,12 +118,7 @@ export default function BorrowPage() {
   /**
    * @dev borrow shares that user have in lending pool
    */
-  const { data: userBorrowShares } = useReadContract({
-    address: lendingPool,
-    abi: poolAbi,
-    functionName: "userBorrowShares",
-    args: [address],
-  });
+  const userBorrowShares = useBorrowBalance();
   /************************************************ */
   const findNameToken = (address: Address | unknown) => {
     const token = TOKEN_OPTIONS.find((asset) => asset.address === address);
@@ -195,10 +192,8 @@ export default function BorrowPage() {
                   <div className="space-y-1 text-center">
                     <div className="text-sm text-slate-400">Debt</div>
                     <div className="text-lg font-medium text-white">
-                      {userBorrowShares
-                        ? convertBorrowShares(userBorrowShares, 1e6)?.toString()
-                        : "0"}{" "}
-                      ${findNameToken(borrowAddress)}
+                      {userBorrowShares || "0"} $
+                      {findNameToken(borrowAddress)}
                     </div>
                   </div>
                   <div className="space-y-1 text-center">

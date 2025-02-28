@@ -16,6 +16,7 @@ import weth from "../../../../public/weth.png";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { WithdrawDialog } from "./withdraw-dialog-col";
+import { useBorrowBalance } from "@/hooks/useBorrowBalance";
 
 export default function AssetsToBorrow() {
   const [hasPosition, setHasPosition] = useState(false);
@@ -95,6 +96,7 @@ export default function AssetsToBorrow() {
 
   const totalSupplyAssets = useSupplyAssets();
   const totalSupplyShares = useSupplyShares();
+  const userBorrowBalance = useBorrowBalance();
 
   const convertBorrowShares = (amount: number | unknown, decimal: number) => {
     if (!amount || !totalSupplyShares) return "0.00";
@@ -162,7 +164,7 @@ export default function AssetsToBorrow() {
             {isBorrowLoading ? (
               <Skeleton className="h-6 w-20 bg-slate-400" />
             ) : (
-              convertBorrowShares(borrowBalance, 1e6)
+              userBorrowBalance
             )}
           </div>
           <div className="col-span-4 flex gap-2 justify-end">

@@ -92,7 +92,7 @@ const AmountInput = ({ value, onChange, token, balance, label }: any) => {
         </div>
 
         <div className="mt-3 text-xs text-slate-500 flex items-center justify-between">
-          <span className="text-sm text-blue-700">Borrow Balance :</span>
+          <span className="text-sm text-blue-700">Debt :</span>
           <div className="flex items-center  text-xs  gap-2">
             <span>{borrowBalance} $USDC</span>
             <button
@@ -111,7 +111,20 @@ const AmountInput = ({ value, onChange, token, balance, label }: any) => {
 export const RepayDialog = () => {
   const supplyShares = useSupplyShares();
   const supplyAssets = useSupplyAssets();
+  const borrowBalance = useBorrowBalance(); // Use the imported hook
+  const { data: totalBorrowAssets } = useReadContract({
+    address: lendingPool,
+    abi: poolAbi,
+    functionName: "totalBorrowAssets",
+    args: [],
+  });
 
+  const { data: totalBorrowShares } = useReadContract({
+    address: lendingPool,
+    abi: poolAbi,
+    functionName: "totalBorrowShares",
+    args: [],
+  });
   const [usdcAmount, setUsdcAmount] = useState("0");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -156,6 +169,21 @@ export const RepayDialog = () => {
     }
   };
 
+  const debtEquals = () => {
+    if (
+      !totalBorrowAssets ||
+      !totalBorrowShares ||
+      !borrowBalance ||
+      Number(totalBorrowShares) === 0
+    ) {
+      return 0;
+    }
+    return Number(
+      (Number(borrowBalance) * Number(totalBorrowAssets)) /
+        Number(totalBorrowShares)
+    );
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -163,7 +191,7 @@ export const RepayDialog = () => {
           className="bg-gradient-to-r from-blue-600 to-indigo-400 hover:from-blue-600 hover:to-indigo-500 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 rounded-lg border-0"
           size="lg"
         >
-           Repay $USDC
+          Repay $USDC
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md bg-gradient-to-b from-white to-slate-50 border-0 shadow-xl rounded-xl">
@@ -180,7 +208,7 @@ export const RepayDialog = () => {
           <AmountInput
             value={usdcAmount}
             onChange={setUsdcAmount}
-            token="USDC"
+            token="Shares"
             balance={usdcBalance}
             label="Repay Amount"
           />
@@ -197,6 +225,11 @@ export const RepayDialog = () => {
                 <p className="text-xs text-blue-600">
                   Repaying your loan will decrease your debt and increase your
                   available credit. This may affect your borrowing capacity.
+                </p>
+                <p className="text-xs text-blue-600 mt-3">
+                  Debt: {borrowBalance} Shares
+                  <br />
+                  Equals to {debtEquals().toFixed(4)} USDC
                 </p>
               </div>
             </div>
