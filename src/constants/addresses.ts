@@ -13,6 +13,3 @@ export const mockEna = "0xBf33A1AaeBADB101D7405E333402f444A6b86Fab" as Address;
 export const mockUsde = "0x7dDB90D42C39AAaE3d79b8Ae8646873EA0Bad3e9" as Address;
 export const hxAddress = "https://testnet-explorer.riselabs.xyz/tx/" as Address;
 
-// Guys Wallet address
-export const ahmad = "0x9CB49d64564819f4396730b408cb16A03315B340"
-export const ghoza = "0x597c129eE29d761f4Add79aF124593Be5E0EB77e"
