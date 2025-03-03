@@ -5,7 +5,7 @@ Follow the instructions below to configure and launch the TraCrafter frontend on
 ## 📋 Clone the Repository
 First, clone the TraCrafter frontend repository from GitHub:
 ```sh
-git clone https://github.com/wearelazydev/frontend.git
+git clone https://github.com/ghozzza/Tracrafter.git
 cd frontend
 ```
 
