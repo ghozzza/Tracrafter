@@ -19,7 +19,7 @@ Before you begin, ensure your system has the following installed:
 ## 📋 Clone the Repository
 Clone the TraCrafter smart contracts repository from GitHub:
 ```sh
-git clone https://github.com/wearelazydev/smart-contracts.git
+git clone https://github.com/ghozzza/Tracrafter.git
 cd smart-contracts
 ```
 
